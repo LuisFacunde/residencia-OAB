@@ -1,8 +1,4 @@
--- Criar o banco de dados DM_TI_FINANCEIRO
--- Autor: [Seu Nome]
--- Data: [Data Atual]
 -- Descrição: Script para criação do banco de dados DM_TI_FINANCEIRO e suas tabelas.
-
 -- Verifica se o banco de dados já existe e o exclui
 IF EXISTS (SELECT * FROM sys.databases WHERE name = 'DM_TI_FINANCEIRO')
 BEGIN
