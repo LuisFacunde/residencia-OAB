@@ -16,6 +16,7 @@ export const ModalTest = () => {
       <Modal1 isOpen={isOpen} onClose={() => setIsOpen(false)}>
         <h2 className="text-xl font-bold mb-4">Este é o modal</h2>
         <p>Você pode fechar clicando fora ou no "×" acima.</p>
+        {/* Modificar aqui Coraline, depois que tu terminar ele comenta e faz outro embaixo, não apaga. */}
       </Modal1>
     </div>
   );
