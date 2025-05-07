@@ -1,2 +1,16 @@
 @import "tailwindcss";
+body {
+    padding: 0;
+    margin: 0;
+}
+.abeezee-regular {
+    font-family: "ABeeZee", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+}
 
+.abeezee-regular-italic {
+    font-family: "ABeeZee", sans-serif;
+    font-weight: 400;
+    font-style: italic;
+}

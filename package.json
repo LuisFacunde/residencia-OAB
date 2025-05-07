@@ -11,6 +11,9 @@
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.5",
+    "ag-grid-community": "^33.2.4",
+    "ag-grid-enterprise": "^33.2.4",
+    "ag-grid-react": "^33.2.4",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-router-dom": "^7.5.3",
