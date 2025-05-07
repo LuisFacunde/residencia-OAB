@@ -12,7 +12,7 @@ function App() {
 
         <Route element={<Layout />}>
           <Route path="/administrativo" element={<PainelAdm />} />
-          <Route path="/tabelas/:nome" element={<Authentication/>} />
+          <Route path="/tabelas/:nome" element="teste" />
         </Route>
       </Routes>
     </BrowserRouter>

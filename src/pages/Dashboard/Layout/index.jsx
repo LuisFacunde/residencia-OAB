@@ -1,19 +1,24 @@
-import { Outlet, NavLink } from "react-router-dom"
+import { Outlet, NavLink, Link } from "react-router-dom"
 import hand from "../../../assets/hand.svg"
 import profile from "../../../assets/profile.svg"
 import logo from "../../../assets/logoOab.svg"
 import painel from "../../../assets/painelIcon.svg"
 import tabela from "../../../assets/tabelaIcon.svg"
 
-const tables = ["tabela1", "tabela2"]
+const tables = ["tabela1", "tabela2", "tabela3"]
 
 export const Layout = () => {
     return(
         <div className="bg-[#F5F5F9] flex">
-            <div className="h-[100vh] w-[300px] bg-[#062360]">
-                <div className="w-[100%] py-[30px] pb-[11px] flex justify-center items-center">
+            <div className="relative h-[100vh] w-[300px] bg-[#062360]">
+                <Link to="/" className="absolute left-6 bottom-10  max-[400px]:p-4">
+                    <p className="flex cursor-pointer text-[#D5D5D5] text-center gap-2 max-[400px]:text-[16px] max-[340px]:text-[14px]">
+                    <img src="/src/assets/arrow-left.svg" alt="" /> Voltar ao menu
+                    </p>
+                </Link>
+                <Link to="/" className="w-[100%] py-[30px] pb-[11px] flex justify-center items-center">
                     <img src={logo} alt="logo oab" />
-                </div>
+                </Link>
                 <ul className="text-[#A4A6B3]">
                     <NavLink
                         to="/Administrativo"

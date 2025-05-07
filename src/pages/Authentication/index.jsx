@@ -34,27 +34,27 @@ export const Authentication = () => {
 
   return (
     <div className="flex">
-      <div className='h-[100vh] w-1/3 relative 
+      <div className='h-[100vh] w-[700px] relative 
           bg-[#062055] bg-gradient-to-r from-[#062055] via-[#2951A3] to-[#122E67] flex
           flex-col justify-center items-center max-[1150px]:hidden'>
         
-        <img className="max-w-75 absolute top-18" src="/src/assets/oab.svg" alt="" />
-        <img className="max-h-170 absolute bottom-0 top-0" src="/src/assets/handshake.svg" alt="" />
-        <div className="absolute bottom-15 text-center flex flex-col gap-4">
+        <img className="max-w-75 absolute top-24" src="/src/assets/oab.svg" alt="" />
+        <img className="max-h-170 absolute w-full top-9" src="/src/assets/handshake.svg" alt="" />
+        <div className="absolute bottom-38 text-center flex flex-col gap-6">
           <h1 className="text-white text-4xl font-bold">PrestOAB</h1>
           <p className="text-[#BDBDBD]">Lorem ipsum dolor sit amet, consectetur <br /> 
           adipiscing elit, sed do eiusmod tempor incididun.</p>
         </div>
       </div>
 
-      <div className="w-2/3">
+      <div className="w-full">
         <div className="p-8 max-[400px]:p-4">
           <p className="flex cursor-pointer text-center gap-2 max-[400px]:text-[16px] max-[340px]:text-[14px]">
             <img src="/src/assets/arrow-left.svg" alt="" /> Voltar ao menu
           </p>
         </div>
 
-        <div className="py-24 flex flex-col justify-center items-center gap-8 max-[1150px]:w-[100vw]">
+        <div className="w-[100%] h-[75%] flex flex-col justify-center items-center gap-8 max-[1150px]:w-[100vw]">
           <div className="text-center flex flex-col gap-3.5">
             <h1 className="text-2xl font-bold max-[400px]:text-[20px] max-[340px]:text-[18px]">SEJA BEM VINDO DE VOLTA!</h1>
             <p className="text-1xl text-[#424242] font-normal max-[400px]:text-[16px] max-[340px]:text-[14px]">FAÇA O LOGIN PARA CONTINUAR</p>

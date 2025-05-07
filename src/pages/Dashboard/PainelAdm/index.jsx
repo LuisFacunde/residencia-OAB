@@ -111,7 +111,7 @@ export const PainelAdm = () => {
           defaultColDef={defaultColDef}
           pagination={true}
           rowSelection="multiple"
-           // editType="fullRow"
+          //  editType="fullRow"
         />
       </div>
     </div>
