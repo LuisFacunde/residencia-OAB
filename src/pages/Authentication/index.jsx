@@ -34,7 +34,7 @@ export const Authentication = () => {
 
   return (
     <div className="flex">
-      <div className='h-[100vh] w-[700px] relative 
+      <div className='h-[100vh] w-[700px] shadow-xl shadow-black relative 
           bg-[#062055] bg-gradient-to-r from-[#062055] via-[#2951A3] to-[#122E67] flex
           flex-col justify-center items-center max-[1150px]:hidden'>
         
@@ -54,7 +54,7 @@ export const Authentication = () => {
           </p>
         </div>
 
-        <div className="w-[100%] h-[75%] flex flex-col justify-center items-center gap-8 max-[1150px]:w-[100vw]">
+        <div className="w-[100%] h-[75%] flex flex-col justify-center items-center gap-8 max-[1150px]:h-[75vh]">
           <div className="text-center flex flex-col gap-3.5">
             <h1 className="text-2xl font-bold max-[400px]:text-[20px] max-[340px]:text-[18px]">SEJA BEM VINDO DE VOLTA!</h1>
             <p className="text-1xl text-[#424242] font-normal max-[400px]:text-[16px] max-[340px]:text-[14px]">FAÇA O LOGIN PARA CONTINUAR</p>
