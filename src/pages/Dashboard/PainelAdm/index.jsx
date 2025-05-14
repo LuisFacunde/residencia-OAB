@@ -4,11 +4,21 @@ import { AllCommunityModule, ModuleRegistry } from "ag-grid-community";
 import { AgGridReact } from "ag-grid-react";
 
 import { themeAlpine } from 'ag-grid-community';
+import { Modal1 } from "../../../components/Modal1";
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 
 export const PainelAdm = () => {
   const gridRef = useRef();
+  const [isFunOpen, setIsFunOpen] = useState(false);
+  const [isTableOpen, setIsTableOpen] = useState(false);
+  const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const [isExportOpen, setIsExportOpen] = useState(false);
+
+  const handleModalTable = () => {
+    setIsCreateOpen(true)
+    setIsTableOpen(false)
+  }
 
   const [rowData, setRowData] = useState([
     { func: "Caio.Carvalho", Setor: "Advocacia", info1: "info extra?", info2: "info extra?", info3: "info extra?" },
@@ -44,7 +54,7 @@ export const PainelAdm = () => {
       headerName: "Funcionário",
       sortable: true,
       filter: true,
-    //   floatingFilter: true,
+      // floatingFilter: true,C
       editable: true,
       checkboxSelection: true,
     },
@@ -89,16 +99,34 @@ export const PainelAdm = () => {
                 </button>
             </li>
             <li>
-                <button className="bg-[#C0090E] text-white px-4 py-2 cursor-pointer  rounded-[10px] mb-4">
+                <button onClick={() => setIsFunOpen(true)} className="bg-[#C0090E] text-white px-4 py-2 cursor-pointer  rounded-[10px] mb-4">
                     Adicionar Funcionario
                 </button>
             </li>
             <li>
-                <button className="bg-[#062360] text-white px-4 py-2 cursor-pointer  rounded-[10px] mb-4">
+                <button onClick={() => setIsTableOpen(true)} className="bg-[#062360] text-white px-4 py-2 cursor-pointer  rounded-[10px] mb-4">
                     Criar Tabela
                 </button>
             </li>
         </ul>
+              <Modal1 isOpen={isFunOpen} onClose={() => setIsFunOpen(false)}>
+                <h2 className="text-xl font-bold mb-4">Este é o modal de funcionario</h2>
+                <p>Você pode fechar clicando fora ou no "×" acima.</p>
+              </Modal1>
+              <Modal1 isOpen={isTableOpen} onClose={() => setIsTableOpen(false)}>
+                <h2 className="text-xl font-bold mb-4">Este é o modal de table</h2>
+                <p>Você pode fechar clicando fora ou no "×" acima.</p>
+                <button className="bg-red-600" onClick={() => setIsTableOpen(false)}>cancelar</button>
+                <button className="bg-black text-white" onClick={() => handleModalTable()}>confirmar</button>
+              </Modal1>
+              <Modal1 isOpen={isCreateOpen} onClose={() => setIsCreateOpen(false)}>
+                <h2 className="text-xl font-bold mb-4">Este é o modal de create</h2>
+                <p>Você pode fechar clicando fora ou no "×" acima.</p>
+              </Modal1>
+              <Modal1 isOpen={isExportOpen} onClose={() => setIsExportOpen(false)}>
+                <h2 className="text-xl font-bold mb-4">Este é o modal de export</h2>
+                <p>Você pode fechar clicando fora ou no "×" acima.</p>
+              </Modal1>
 
 
       <div className="ag-theme-alpine w-full h-[720px]">
@@ -111,7 +139,7 @@ export const PainelAdm = () => {
           defaultColDef={defaultColDef}
           pagination={true}
           rowSelection="multiple"
-          //  editType="fullRow"
+           editType="fullRow"
         />
       </div>
     </div>

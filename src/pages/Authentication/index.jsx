@@ -61,27 +61,6 @@ export const Authentication = () => {
           </div>
 
           <form onSubmit={handleSubmit} className="w-full max-w-md flex flex-col gap-4 px-9">
-            <div className="relative w-full">
-              <select
-                name="sector"
-                value={formData.sector}
-                onChange={handleInputChange}
-                className="cursor-pointer p-4 w-full border border-[#757575] rounded pl-4 pr-12 appearance-none"
-                required
-              >
-                <option value="">Selecione o setor</option>
-                <option value="admin">Admin</option>   
-              </select>
-              
-              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-4">
-                <img 
-                  src="/src/assets/arrow-down.svg" 
-                  alt=""
-                  className="w-6 h-6 text-gray-500" 
-                />
-              </div>
-            </div>
-
             <input
               name="username"
               value={formData.username}
