@@ -1,4 +1,4 @@
-import React, { StrictMode, useRef, useState } from "react";
+import React, { StrictMode, useRef, useState, useCallback, useEffect } from "react";
 import { createRoot } from "react-dom/client";
 import { AllCommunityModule, ModuleRegistry } from "ag-grid-community";
 import { AgGridReact } from "ag-grid-react";
@@ -19,15 +19,7 @@ export const PainelAdm = () => {
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isExportOpen, setIsExportOpen] = useState(false);
   const [selectedOption, setSelectedOption] = useState('');
-
-    const handleModalTable = () => {
-      if (selectedOption === 'hosting-small') {
-        setIsCreateOpen(true);
-      } else if (selectedOption === 'hosting-big') {
-        setIsExportOpen(true);
-      }
-      setIsTableOpen(false);
-    };
+  
 
   const [rowData, setRowData] = useState([
     { func: "Caio.Carvalho", Setor: "Advocacia", info1: "info extra?", info2: "info extra?", info3: "info extra?" },
@@ -91,8 +83,43 @@ export const PainelAdm = () => {
 
   const rowHeight = 50;
 
+  const [quickFilterText, setQuickFilterText] = useState('');
+  const [filteredRowData, setFilteredRowData] = useState([]);
+
+  useEffect(() => {
+    setFilteredRowData(rowData);
+  }, [rowData]);
+
+  const onFilterTextBoxChanged = useCallback((e) => {
+    const searchValue = e.target.value.toLowerCase();
+    setQuickFilterText(searchValue);
+    
+    if (!searchValue) {
+      setFilteredRowData(rowData);
+      return;
+    }
+
+    const filteredData = rowData.filter(row => {
+      return Object.values(row).some(value => 
+        String(value).toLowerCase().includes(searchValue)
+      );
+    });
+
+    setFilteredRowData(filteredData);
+  }, [rowData]);
+
+    const handleModalTable = () => {
+      if (selectedOption === 'hosting-small') {
+        setIsCreateOpen(true);
+      } else if (selectedOption === 'hosting-big') {
+        setIsExportOpen(true);
+      }
+      setIsTableOpen(false);
+    };
+    
   return (
     <div className="p-4">
+      <div className="flex justify-between">
         <ul className="flex gap-3.5">
             <li>
                 <button
@@ -118,6 +145,36 @@ export const PainelAdm = () => {
                 </button>
             </li>
         </ul>
+        <div className="w-[400px]">
+          <div className="relative">
+            <input
+              type="text"
+              placeholder="Buscar em todos os dados..."
+              className="p-2 border border-gray-300 rounded-md w-full pl-10"
+              value={quickFilterText}
+              onChange={onFilterTextBoxChanged}
+            />
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <svg className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </div>
+            {quickFilterText && (
+              <button
+                onClick={() => {
+                  setQuickFilterText('');
+                  setFilteredRowData(rowData);
+                }}
+                className="absolute inset-y-0 right-0 pr-3 flex items-center"
+              >
+                <svg className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
               <Modal1 isOpen={isFunOpen} onClose={() => setIsFunOpen(false)}>
                 <ModalIcon image={funcionarioIcon}/>
                 <div className="flex flex-col gap-5">
@@ -238,7 +295,7 @@ export const PainelAdm = () => {
           ref={gridRef}
           theme={themeAlpine}
           rowHeight={rowHeight}
-          rowData={rowData}
+          rowData={filteredRowData}
           columnDefs={colDefs}
           defaultColDef={defaultColDef}
           pagination={true}
