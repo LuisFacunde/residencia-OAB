@@ -9,7 +9,7 @@ import { ModalInput } from "../../../components/ModalInput";
 import { ModalIcon } from "../../../components/ModalIcon";
 import { ModalButtons } from "../../../components/ModalButtons";
 import modalIcon from "../../../assets/tabelaIcon.svg"
-
+import funcionarioIcon from "../../../assets/funcionarioIcon.svg"
 ModuleRegistry.registerModules([AllCommunityModule]);
 
 export const PainelAdm = () => {
@@ -119,10 +119,24 @@ export const PainelAdm = () => {
             </li>
         </ul>
               <Modal1 isOpen={isFunOpen} onClose={() => setIsFunOpen(false)}>
-                <h2 className="text-xl font-bold mb-4">Este é o modal de funcionario</h2>
-                <p>Você pode fechar clicando fora ou no "×" acima.</p>
-                <ModalInput showLabel={true} label="Nome Completo" placeholder="Nome completo"  />
-                <ModalInput showLabel={true} label="Setor" placeholder="Digite o setor"  />
+                <ModalIcon image={funcionarioIcon}/>
+                <div className="flex flex-col gap-5">
+
+                    <div className="flex flex-col gap-1">
+                      <h2 className="text-xl font-bold">Criar Funcionario</h2>
+                      <p>Preencha os dados para cadastrar um novo funcionário no sistema da OAB.</p>
+                    </div>
+
+                    <div className="flex flex-col gap-3">
+                      <ModalInput  label="Nome Completo" placeholder="Nome completo"  />
+                      <ModalInput  label="Setor" placeholder="Digite o setor"  />
+                    </div>
+
+                    <div className="flex gap-3 mt-3">
+                      <ModalButtons text="Cancelar" onClick={() => setIsFunOpen(false)}/>
+                      <ModalButtons text="Confirmar" />
+                    </div>
+                </div>
               </Modal1>
               <Modal1 isOpen={isTableOpen} onClose={() => setIsTableOpen(false)}>
                 <div className="flex flex-col gap-5">
