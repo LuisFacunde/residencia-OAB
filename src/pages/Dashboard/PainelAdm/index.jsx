@@ -218,8 +218,18 @@ export const PainelAdm = () => {
                 <p>Você pode fechar clicando fora ou no "×" acima.</p>
               </Modal1>
               <Modal1 isOpen={isExportOpen} onClose={() => setIsExportOpen(false)}>
-                <h2 className="text-xl font-bold mb-4">Este é o modal de export</h2>
-                <p>Você pode fechar clicando fora ou no "×" acima.</p>
+              <div className="flex flex-col gap-5">
+                  <ModalIcon image={modalIcon}/>
+                  <div className="flex flex-col gap-0.5">
+                    <h1 className="text-[#181D27] font-bold text-[18px]">Criar Tabela</h1>
+                    <p className="text-[#535862] text-[14px]">Selecione o ficheiro da sua planilha</p>
+                  </div>
+                  <ModalInput showLabel={false} placeholder="Selecione o ficheiro"  />
+                  <div className="flex gap-3">
+                    <ModalButtons text="Cancelar" onClick={() => setIsExportOpen(false)}/>
+                    <ModalButtons text="Confirmar" onClick={() => setIsExportOpen(false)}/>
+                  </div>
+                </div>
               </Modal1>
 
 
