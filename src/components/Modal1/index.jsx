@@ -18,7 +18,7 @@ export const Modal1 = ({ isOpen, onClose, children }) => {
       <div className="bg-white p-6 rounded-lg shadow-lg relative max-w-md w-full">
         <button
           onClick={onClose}
-          className="absolute top-2 right-2 text-gray-500 hover:text-red-600"
+          className="absolute top-5 right-6 text-[28px] font-400 text-gray-500 hover:text-red-600"
         >
           &times;
         </button>
