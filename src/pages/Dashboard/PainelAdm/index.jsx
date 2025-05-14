@@ -19,6 +19,7 @@ export const PainelAdm = () => {
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isExportOpen, setIsExportOpen] = useState(false);
   const [selectedOption, setSelectedOption] = useState('');
+  const [columns, setColumns] = useState(['']);
 
     const handleModalTable = () => {
       if (selectedOption === 'hosting-small') {
@@ -29,6 +30,16 @@ export const PainelAdm = () => {
       setIsTableOpen(false);
     };
 
+    
+  const addColumn = () => {
+    setColumns([...columns, '']); 
+  };
+
+  const handleColumnChange = (index, value) => {
+    const newColumns = [...columns];
+    newColumns[index] = value;
+    setColumns(newColumns);
+  };
   const [rowData, setRowData] = useState([
     { func: "Caio.Carvalho", Setor: "Advocacia", info1: "info extra?", info2: "info extra?", info3: "info extra?" },
     { func: "Arthur.Tavares", Setor: "Advocacia", info1: "info extra?", info2: "info extra?", info3: "info extra?" },
@@ -214,8 +225,41 @@ export const PainelAdm = () => {
                 </div>
               </Modal1>
               <Modal1 isOpen={isCreateOpen} onClose={() => setIsCreateOpen(false)}>
-                <h2 className="text-xl font-bold mb-4">Este é o modal de create</h2>
-                <p>Você pode fechar clicando fora ou no "×" acima.</p>
+                <ModalIcon image={modalIcon}/>
+                <div className="flex flex-col gap-5 mt-4">
+
+                  <div className="flex flex-col gap-1">
+                    <h2 className="text-xl font-bold ">Criar Tabela</h2>
+                    <p>Preencha as informações para criar uma nova tabela.</p>
+                  </div>
+
+                  <div className="flex flex-col gap-2">
+                    <ModalInput label="Nome da tabela" placeholder="Digite o nome da tabela"/>
+                    
+                    {columns.map((column, index) => (
+                      <ModalInput 
+                        key={index}
+                        label={index === 0 ? "Coluna da Tabela" : false}
+                        placeholder="Digite o nome da coluna"
+                        value={column}
+                        onChange={(e) => handleColumnChange(index, e.target.value)}
+                      />
+                    ))}
+                    
+                    <button 
+                      className="text-[#062360] cursor-pointer font-medium w-fit px-2 py-1 rounded hover:bg-[#b0c5ed] transition-colors"
+                      onClick={addColumn}
+                    >
+                      + Adicionar Coluna
+                    </button>
+                </div>
+
+                
+                  <div className="flex gap-3 mt-3">
+                      <ModalButtons text="Cancelar" onClick={() => setIsCreateOpen(false)}/>
+                      <ModalButtons text="Confirmar" />
+                    </div>
+                </div>
               </Modal1>
               <Modal1 isOpen={isExportOpen} onClose={() => setIsExportOpen(false)}>
                 <h2 className="text-xl font-bold mb-4">Este é o modal de export</h2>
