@@ -18,11 +18,16 @@ export const PainelAdm = () => {
   const [isTableOpen, setIsTableOpen] = useState(false);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isExportOpen, setIsExportOpen] = useState(false);
+  const [selectedOption, setSelectedOption] = useState('');
 
-  const handleModalTable = () => {
-    setIsCreateOpen(true)
-    setIsTableOpen(false)
-  }
+    const handleModalTable = () => {
+      if (selectedOption === 'hosting-small') {
+        setIsCreateOpen(true);
+      } else if (selectedOption === 'hosting-big') {
+        setIsExportOpen(true);
+      }
+      setIsTableOpen(false);
+    };
 
   const [rowData, setRowData] = useState([
     { func: "Caio.Carvalho", Setor: "Advocacia", info1: "info extra?", info2: "info extra?", info3: "info extra?" },
@@ -134,12 +139,79 @@ export const PainelAdm = () => {
                 </div>
               </Modal1>
               <Modal1 isOpen={isTableOpen} onClose={() => setIsTableOpen(false)}>
-              <ModalIcon image={modalIcon}/>
-                <div className="flex gap-3">
-                  <ModalButtons text="Cancelar" onClick={() => setIsTableOpen(false)}/>
-                  <ModalButtons text="Confirmar" onClick={() => handleModalTable()}/>
-                </div>
+                <div className="flex flex-col gap-5">
+                  <ModalIcon image={modalIcon}/>
+                  <div className="flex flex-col gap-0.5">
+                    <h1 className="text-[#181D27] font-bold text-[18px]">Criar Tabela</h1>
+                    <p className="text-[#535862] text-[14px]">Escolha a criação de tabela mais apropriada para o seu objetivo</p>
+                  </div>         
+                  <ul className="flex w-full gap-3 flex-col">
+                    <li>
+                      <input
+                        type="radio"
+                        id="hosting-small"
+                        name="hosting"
+                        value="hosting-small"
+                        className="hidden peer"
+                        checked={selectedOption === 'hosting-small'}
+                        onChange={(e) => setSelectedOption(e.target.value)}
+                        required
+                      />
+                      <label
+                        htmlFor="hosting-small"
+                        className="inline-flex items-center justify-between peer-checked:text-[#6941C6] w-full p-5 text-gray-500 bg-white border border-gray-200 rounded-lg cursor-pointer peer-checked:border-[#E5DCFB] peer-checked:border-2 peer-checked:bg-[#F9F5FF] hover:text-gray-600 hover:bg-gray-100"
+                      >
+                        <div className="block">
+                          <h1 className="w-full text-lg font-semibold">Criar Tabela Nova</h1>
+                          <p className="w-full">Criação de tabela a partir de colunas</p>
+                        </div>
+                        <svg className="w-5 h-5 ms-3 rtl:rotate-180" aria-hidden="true" fill="none" viewBox="0 0 14 10">
+                          <path
+                            stroke="currentColor"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            d="M1 5h12m0 0L9 1m4 4L9 9"
+                          />
+                        </svg>
+                      </label>
+                    </li>
 
+                    <li>
+                      <input
+                        type="radio"
+                        id="hosting-big"
+                        name="hosting"
+                        value="hosting-big"
+                        className="hidden peer"
+                        checked={selectedOption === 'hosting-big'}
+                        onChange={(e) => setSelectedOption(e.target.value)}
+                      />
+                      <label
+                        htmlFor="hosting-big"
+                        className="inline-flex items-center justify-between peer-checked:text-[#6941C6] w-full p-5 text-gray-500 bg-white border border-gray-200 rounded-lg cursor-pointer peer-checked:border-[#E5DCFB] peer-checked:border-2 peer-checked:bg-[#F9F5FF] hover:text-gray-600 hover:bg-gray-100"
+                      >
+                        <div className="block">
+                          <div className="w-full text-lg font-semibold">Exportar Planilha</div>
+                          <div className="w-full">Criação de tabela a partir de uma planilha</div>
+                        </div>
+                        <svg className="w-5 h-5 ms-3 rtl:rotate-180" aria-hidden="true" fill="none" viewBox="0 0 14 10">
+                          <path
+                            stroke="currentColor"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            d="M1 5h12m0 0L9 1m4 4L9 9"
+                          />
+                        </svg>
+                      </label>
+                    </li>
+                  </ul>
+                  <div className="flex gap-3">
+                    <ModalButtons text="Cancelar" onClick={() => setIsTableOpen(false)}/>
+                    <ModalButtons text="Confirmar" onClick={handleModalTable}/>
+                  </div>
+                </div>
               </Modal1>
               <Modal1 isOpen={isCreateOpen} onClose={() => setIsCreateOpen(false)}>
                 <h2 className="text-xl font-bold mb-4">Este é o modal de create</h2>
