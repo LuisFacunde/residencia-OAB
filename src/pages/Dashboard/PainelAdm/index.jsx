@@ -145,7 +145,7 @@ export const PainelAdm = () => {
                       />
                       <label
                         htmlFor="hosting-small"
-                        className="inline-flex items-center justify-between peer-checked:text-[#6941C6] w-full p-5 text-gray-500 bg-white border border-gray-200 rounded-lg cursor-pointer peer-checked:border-[#E5DCFB] peer-checked:border-2 peer-checked:bg-[#F9F5FF] hover:text-gray-600 hover:bg-gray-100"
+                        className="inline-flex items-center justify-between peer-checked:text-[#6941C6] w-full p-5 text-gray-500 bg-white border border-gray-200 rounded-lg cursor-pointer peer-checked:border-[#E5DCFB] peer-checked:border-2 peer-checked:bg-[#F9F5FF] hover:text-[#6941C6] hover:bg-gray-100"
                       >
                         <div className="block">
                           <h1 className="w-full text-lg font-semibold">Criar Tabela Nova</h1>
@@ -175,7 +175,7 @@ export const PainelAdm = () => {
                       />
                       <label
                         htmlFor="hosting-big"
-                        className="inline-flex items-center justify-between peer-checked:text-[#6941C6] w-full p-5 text-gray-500 bg-white border border-gray-200 rounded-lg cursor-pointer peer-checked:border-[#E5DCFB] peer-checked:border-2 peer-checked:bg-[#F9F5FF] hover:text-gray-600 hover:bg-gray-100"
+                        className="inline-flex items-center justify-between peer-checked:text-[#6941C6] w-full p-5 text-gray-500 bg-white border border-gray-200 rounded-lg cursor-pointer peer-checked:border-[#E5DCFB] peer-checked:border-2 peer-checked:bg-[#F9F5FF] hover:text-[#6941C6] hover:bg-gray-100"
                       >
                         <div className="block">
                           <div className="w-full text-lg font-semibold">Exportar Planilha</div>
@@ -209,7 +209,7 @@ export const PainelAdm = () => {
               </Modal1>
 
 
-      <div className="ag-theme-alpine w-full h-[720px]">
+      <div className="ag-theme-alpine w-full h-[60vh]">
         <AgGridReact
           ref={gridRef}
           theme={themeAlpine}
