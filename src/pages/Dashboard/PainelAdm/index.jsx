@@ -5,6 +5,7 @@ import { AgGridReact } from "ag-grid-react";
 
 import { themeAlpine } from 'ag-grid-community';
 import { Modal1 } from "../../../components/Modal1";
+import { ModalInput } from "../../../components/ModalInput";
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 
@@ -112,6 +113,8 @@ export const PainelAdm = () => {
               <Modal1 isOpen={isFunOpen} onClose={() => setIsFunOpen(false)}>
                 <h2 className="text-xl font-bold mb-4">Este é o modal de funcionario</h2>
                 <p>Você pode fechar clicando fora ou no "×" acima.</p>
+                <ModalInput showLabel={true} label="Nome Completo" placeholder="Nome completo"  />
+                <ModalInput showLabel={true} label="Setor" placeholder="Digite o setor"  />
               </Modal1>
               <Modal1 isOpen={isTableOpen} onClose={() => setIsTableOpen(false)}>
                 <h2 className="text-xl font-bold mb-4">Este é o modal de table</h2>
