@@ -5,6 +5,7 @@ import { AgGridReact } from "ag-grid-react";
 
 import { themeAlpine } from 'ag-grid-community';
 import { Modal1 } from "../../../components/Modal1";
+import { ModalButtons } from "../../../components/ModalButtons";
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 
@@ -116,8 +117,11 @@ export const PainelAdm = () => {
               <Modal1 isOpen={isTableOpen} onClose={() => setIsTableOpen(false)}>
                 <h2 className="text-xl font-bold mb-4">Este é o modal de table</h2>
                 <p>Você pode fechar clicando fora ou no "×" acima.</p>
-                <button className="bg-red-600" onClick={() => setIsTableOpen(false)}>cancelar</button>
-                <button className="bg-black text-white" onClick={() => handleModalTable()}>confirmar</button>
+                <div className="flex gap-3">
+                  <ModalButtons text="Cancelar" onClick={() => setIsTableOpen(false)}/>
+                  <ModalButtons text="Confirmar" onClick={() => handleModalTable()}/>
+                </div>
+
               </Modal1>
               <Modal1 isOpen={isCreateOpen} onClose={() => setIsCreateOpen(false)}>
                 <h2 className="text-xl font-bold mb-4">Este é o modal de create</h2>
