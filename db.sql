@@ -1,98 +1,180 @@
--- Descrição: Script para criação do banco de dados DM_TI_FINANCEIRO e suas tabelas.
--- Verifica se o banco de dados já existe e o exclui
-IF EXISTS (SELECT * FROM sys.databases WHERE name = 'DM_TI_FINANCEIRO')
-BEGIN
-    DROP DATABASE DM_TI_FINANCEIRO;
-END
-GO
-
--- Cria o banco de dados DM_TI_FINANCEIRO
 CREATE DATABASE DM_TI_FINANCEIRO;
-GO
 
--- Tabela TipoDesconto
-CREATE TABLE TipoDesconto (
-    Id INT IDENTITY(1,1),
-    Nome VARCHAR(100) NOT NULL,
-    CONSTRAINT Pk_Id_TipoDesconto PRIMARY KEY (Id)
-);
-GO
+USE DM_TI_FINANCEIRO;
 
--- Tabela Transparencia
-CREATE TABLE Transparencia (
-    Id INT IDENTITY(1,1),
-    Demonstracao VARCHAR(80) NOT NULL,
-    Referencia VARCHAR(80) NOT NULL,
-    Ano VARCHAR(4) NOT NULL,
-    Periodicidade VARCHAR(80) NOT NULL,
-    DtPrevEntr DATE NOT NULL,
-    DtEntrega DATE,
-    Id_usuario INT NOT NULL,
-    CONSTRAINT Pk_Id_Transparencia PRIMARY KEY (Id)
-);
-GO
-
--- Tabela Subseccional
 CREATE TABLE Subseccional (
-    Id INT,
-    SubSeccional VARCHAR(100) NOT NULL,
-    Id_usuario INT NOT NULL,
-    CONSTRAINT Pk_Id_Subseccional PRIMARY KEY (Id)
+	Id INT NOT NULL,
+	Descricao VARCHAR(100) NOT NULL,
+	Id_usuario INT NOT NULL,
+CONSTRAINT Pk_Id_Subseccional PRIMARY KEY (Id)
 );
-GO
 
--- Tabela BalanceteCFOAB
+CREATE TABLE Demonstrativo (
+	Id INT IDENTITY(1,1),
+	Descricao VARCHAR(100) NOT NULL
+CONSTRAINT Pk_Id_Demonst PRIMARY KEY (Id)
+);
+
+CREATE TABLE Instituicao (
+	Id INT IDENTITY(1,1),
+	Descricao VARCHAR(100) NOT NULL
+CONSTRAINT Pk_Id_Instit PRIMARY KEY (Id)
+);
+
+CREATE TABLE Transparencia (
+	Id INT IDENTITY(1,1),
+	Id_Demonst INT NOT NULL,
+	Referencia VARCHAR(80) NOT NULL,
+	Ano VARCHAR(4) NOT NULL,
+	Periodicidade VARCHAR(80) NOT NULL,
+	DtPrevEntr DATE NOT NULL,
+	DtEntrega DATE,
+CONSTRAINT Pk_Id_Transpparencia PRIMARY KEY (Id),
+CONSTRAINT Fk_Id_Demonst FOREIGN KEY (Id_Demonst) REFERENCES Demonstrativo (Id)
+);
+
 CREATE TABLE BalanceteCFOAB (
-    Id INT IDENTITY(1,1),
-    Demonstracao VARCHAR(80) NOT NULL,
-    Referencia VARCHAR(80) NOT NULL,
-    Ano VARCHAR(4) NOT NULL,
-    Periodicidade VARCHAR(80) NOT NULL,
-    DtPrevEntr DATE NOT NULL,
-    DtEntrega DATE,
-    Id_usuario INT NOT NULL,
-    CONSTRAINT Pk_Id_BalancCFOAB PRIMARY KEY (Id)
+	Id INT IDENTITY(1,1),
+	Id_Demonst INT NOT NULL,
+	Referencia VARCHAR(80) NOT NULL,
+	Ano VARCHAR(4) NOT NULL,
+	Periodicidade VARCHAR(80) NOT NULL,
+	DtPrevEntr DATE NOT NULL,
+	DtEntrega DATE,
+	Eficiencia INT,
+CONSTRAINT Pk_Id_BalancCFOAB PRIMARY KEY (Id),
+CONSTRAINT Fk_Id_DemonstBal FOREIGN KEY (Id_Demonst) REFERENCES Demonstrativo (Id)
 );
-GO
 
--- Tabela PagamentoCotas
 CREATE TABLE PagamentoCotas (
-    Id INT IDENTITY(1,1),
-    Instituicao VARCHAR(100) NOT NULL,
-    MesReferencia VARCHAR(10) NOT NULL,
-    Ano VARCHAR(4) NOT NULL,
-    ValorDevido DECIMAL(15,2),
-    DtPrevEntr DATE NOT NULL,
-    ValorPago DECIMAL(15,2),
-    DtPagto DATE,
-    Observacao VARCHAR(255),
-    Id_usuario INT NOT NULL,
-    CONSTRAINT Pk_Id_PagtoCotas PRIMARY KEY (Id)
+	Id INT IDENTITY(1,1),
+	Id_Instit INT NOT NULL,
+	MesRef VARCHAR(10) NOT NULL,
+	AnoRef VARCHAR(4) NOT NULL,
+	DtPrevEntr DATE NOT NULL,
+	ValorDuodecimo DECIMAL(19,2),
+	ValorDesconto DECIMAL(19,2),
+	Id_TpDesc INT NOT NULL,
+	ValorPago DECIMAL(19,2),
+	DtPagto DATE,
+	Observacao VARCHAR(255),
+CONSTRAINT Pk_Id_PagtoCotas PRIMARY KEY (Id),
+CONSTRAINT Fk_Id_Instit FOREIGN KEY (Id_Instit) REFERENCES Instituicao (Id)
 );
-GO
 
--- Tabela PrestacaoContasSubseccional
 CREATE TABLE PrestacaoContasSubseccional (
-    Id INT IDENTITY(1,1),
-    Id_Subseccional INT NOT NULL,
-    MesReferencia VARCHAR(10) NOT NULL,
-    Ano VARCHAR(4) NOT NULL,
-    DtPrevEntr DATE NOT NULL,
-    DtEntrega DATE,
-    DtPagto DATE,
-    ValorDesconto DECIMAL(15,2),
-    ValorDuodecimo DECIMAL(15,2),
-    ValorPago AS (ValorDuodecimo - ValorDesconto) PERSISTED,
-    Observacao VARCHAR(255),
-    Status VARCHAR(1),
-    ProtocoloSGD VARCHAR(17),
-    Id_TipoDesconto INT,
-    Id_usuario INT NOT NULL,
-    CONSTRAINT Pk_Id_PrestContasSub PRIMARY KEY (Id),
-    CONSTRAINT FK_Id_Subseccional FOREIGN KEY (Id_Subseccional) REFERENCES Subseccional (Id),
-    CONSTRAINT FK_Id_TipoDesconto FOREIGN KEY (Id_TipoDesconto) REFERENCES TipoDesconto (Id)
+	Id INT IDENTITY(1,1),
+	Id_Subseccional INT NOT NULL,
+	MesRef VARCHAR(10) NOT NULL,
+	AnoRef VARCHAR(4) NOT NULL,
+	DtPrevEntr DATE NOT NULL,
+	DtEntrega DATE,
+	DtPagto DATE,
+	ValorPago DECIMAL(19,2),
+	Eficiencia INT,
+	Observacao VARCHAR(255),
+	Status VARCHAR(1),
+CONSTRAINT Pk_Id_PrestContasSub PRIMARY KEY (Id),
+CONSTRAINT FK_Id_SubsecPrestCont FOREIGN KEY (Id_Subseccional) REFERENCES Subseccional (Id)
 );
-GO
 
-SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE';
-GO
+CREATE TABLE BaseOrcamentaria(
+	Id INT IDENTITY(1,1),
+	Id_Lancto INT NOT NULL,
+	Lancto VARCHAR(50) NOT NULL,
+	Valor DECIMAL(19, 2) NOT NULL,
+	DtDocto DATE NOT NULL,
+	DtLancto DATE NOT NULL,
+	Ano INT NOT NULL,
+	Tipo VARCHAR(50) NOT NULL,
+CONSTRAINT Pk_Id_BaseOrc PRIMARY KEY (Id)
+);
+
+CREATE TABLE Perfis (
+    Id INT IDENTITY(1,1) PRIMARY KEY,
+    Nome VARCHAR(50) NOT NULL UNIQUE
+);
+
+INSERT INTO Perfis (Nome) VALUES 
+('Admin'),
+('Leitura'),
+('Escrita'),
+('Auditoria');
+
+CREATE TABLE Usuarios (
+    Id INT IDENTITY(1,1) PRIMARY KEY,
+    Nome VARCHAR(100) NOT NULL,
+    Email VARCHAR(100) NOT NULL UNIQUE,
+    Senha VARCHAR(255) NOT NULL,
+    Id_Perfil INT NOT NULL,
+    CONSTRAINT FK_Id_Perfil FOREIGN KEY (Id_Perfil) REFERENCES Perfis(Id)
+);
+
+CREATE TABLE Permissoes (
+    Id INT IDENTITY(1,1) PRIMARY KEY,
+    Id_Perfil INT NOT NULL,
+    Modulo VARCHAR(50) NOT NULL,        
+    P_Create BIT DEFAULT 0,           
+    P_Read BIT DEFAULT 0,           
+    P_Update BIT DEFAULT 0,          
+    P_Delete BIT DEFAULT 0,           
+    CONSTRAINT FK_Permissao_Perfil FOREIGN KEY (Id_Perfil) REFERENCES Perfis(Id)
+);
+
+INSERT INTO Permissoes (Id_Perfil, Modulo, P_Create, P_Read, P_Update, P_Delete)
+VALUES 
+(1, 'Subseccional', 1, 1, 1, 1),
+(1, 'Demonstrativo', 1, 1, 1, 1),
+(1, 'Instituicao', 1, 1, 1, 1),
+(1, 'Transparencia', 1, 1, 1, 1),
+(1, 'BalanceteCFOAB', 1, 1, 1, 1),
+(1, 'PagamentoCotas', 1, 1, 1, 1),
+(1, 'PrestacaoContasSubseccional', 1, 1, 1, 1),
+(1, 'BaseOrcamentaria', 1, 1, 1, 1),
+(1, 'Usuarios', 1, 1, 1, 1);
+
+INSERT INTO Permissoes (Id_Perfil, Modulo, P_Create, P_Read, P_Update, P_Delete)
+VALUES 
+(2, 'Subseccional', 0, 1, 0, 0),
+(2, 'Demonstrativo', 0, 1, 0, 0),
+(2, 'Instituicao', 0, 1, 0, 0),
+(2, 'Transparencia', 0, 1, 0, 0),
+(2, 'BalanceteCFOAB', 0, 1, 0, 0),
+(2, 'PagamentoCotas', 0, 1, 0, 0),
+(2, 'PrestacaoContasSubseccional', 0, 1, 0, 0),
+(2, 'BaseOrcamentaria', 0, 1, 0, 0),
+(2, 'Usuarios', 0, 1, 0, 0);
+
+INSERT INTO Permissoes (Id_Perfil, Modulo, P_Create, P_Read, P_Update, P_Delete)
+VALUES 
+(3, 'Subseccional', 1, 1, 1, 0),
+(3, 'Demonstrativo', 1, 1, 1, 0),
+(3, 'Instituicao', 1, 1, 1, 0),
+(3, 'Transparencia', 1, 1, 1, 0),
+(3, 'BalanceteCFOAB', 1, 1, 1, 0),
+(3, 'PagamentoCotas', 1, 1, 1, 0),
+(3, 'PrestacaoContasSubseccional', 1, 1, 1, 0),
+(3, 'BaseOrcamentaria', 1, 1, 1, 0),
+(3, 'Usuarios', 1, 1, 1, 0);
+
+INSERT INTO Permissoes (Id_Perfil, Modulo, P_Create, P_Read, P_Update, P_Delete)
+VALUES 
+(4, 'Subseccional', 0, 1, 0, 0),
+(4, 'Demonstrativo', 0, 1, 0, 0),
+(4, 'Instituicao', 0, 1, 0, 0),
+(4, 'Transparencia', 0, 1, 0, 0),
+(4, 'BalanceteCFOAB', 0, 1, 0, 0),
+(4, 'PagamentoCotas', 0, 1, 0, 0),
+(4, 'PrestacaoContasSubseccional', 0, 1, 0, 0),
+(4, 'BaseOrcamentaria', 0, 1, 0, 0),
+(4, 'Usuarios', 0, 1, 0, 0);
+
+ALTER TABLE Subseccional ADD Status CHAR(1) DEFAULT 'A';
+ALTER TABLE Demonstrativo ADD Status CHAR(1) DEFAULT 'A';
+ALTER TABLE Instituicao ADD Status CHAR(1) DEFAULT 'A';
+ALTER TABLE Transparencia ADD Status CHAR(1) DEFAULT 'A';
+ALTER TABLE BalanceteCFOAB ADD Status CHAR(1) DEFAULT 'A';
+ALTER TABLE PagamentoCotas ADD Status CHAR(1) DEFAULT 'A';
+ALTER TABLE PrestacaoContasSubseccional ADD Status CHAR(1) DEFAULT 'A';
+ALTER TABLE BaseOrcamentaria ADD Status CHAR(1) DEFAULT 'A';
+ALTER TABLE Usuarios ADD Status CHAR(1) DEFAULT 'A';
