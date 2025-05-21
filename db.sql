@@ -131,6 +131,15 @@ CREATE TABLE Permissoes (
     CONSTRAINT FK_Permissao_Perfil FOREIGN KEY (Id_Perfil) REFERENCES Perfis(Id)
 );
 
+CREATE TABLE LogAtividade (
+    Id INT PRIMARY KEY AUTOINCREMENT,
+    Tabela VARCHAR(50) NOT NULL,
+    Acao VARCHAR(10) NOT NULL,           
+    Id_Registro INT,
+    NomeUsuario VARCHAR(100) NOT NULL,
+    DataHora DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
 INSERT INTO Permissoes (Id_Perfil, Modulo, P_Create, P_Read, P_Update, P_Delete)
 VALUES 
 (1, 'Subseccional', 1, 1, 1, 1),
