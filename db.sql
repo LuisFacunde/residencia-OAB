@@ -132,12 +132,12 @@ CREATE TABLE Permissoes (
 );
 
 CREATE TABLE LogAtividade (
-    Id INT PRIMARY KEY AUTOINCREMENT,
-    Tabela VARCHAR(50) NOT NULL,
-    Acao VARCHAR(10) NOT NULL,           
-    Id_Registro INT,
-    NomeUsuario VARCHAR(100) NOT NULL,
-    DataHora DATETIME DEFAULT CURRENT_TIMESTAMP
+	Id INT IDENTITY(1,1) PRIMARY KEY,
+	Tabela VARCHAR(50) NOT NULL,
+	Acao VARCHAR(10) NOT NULL,           
+	Id_Registro INT,
+	NomeUsuario VARCHAR(100) NOT NULL,
+	DataHora DATETIME DEFAULT GETDATE()
 );
 
 INSERT INTO Permissoes (Id_Perfil, Modulo, P_Create, P_Read, P_Update, P_Delete)
