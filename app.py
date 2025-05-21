@@ -20,7 +20,7 @@ def login():
     if usuario:
         return jsonify(usuario), 200
     else:
-        return jsonify({"erro": "Email ou senha inválidos"}), 401
+        return jsonify({"erro": "Usuário ou senha inválidos"}), 401
 
 @app.route('/instituicoes', methods=['GET'])
 def listar_instituicoes():
