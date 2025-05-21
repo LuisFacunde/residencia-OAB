@@ -6,18 +6,21 @@ CREATE TABLE Subseccional (
 	Id INT NOT NULL,
 	Descricao VARCHAR(100) NOT NULL,
 	Id_usuario INT NOT NULL,
+	Status CHAR(1) DEFAULT 'A',
 CONSTRAINT Pk_Id_Subseccional PRIMARY KEY (Id)
 );
 
 CREATE TABLE Demonstrativo (
 	Id INT IDENTITY(1,1),
-	Descricao VARCHAR(100) NOT NULL
+	Descricao VARCHAR(100) NOT NULL,
+	Status CHAR(1) DEFAULT 'A',
 CONSTRAINT Pk_Id_Demonst PRIMARY KEY (Id)
 );
 
 CREATE TABLE Instituicao (
 	Id INT IDENTITY(1,1),
-	Descricao VARCHAR(100) NOT NULL
+	Descricao VARCHAR(100) NOT NULL,
+	Status CHAR(1) DEFAULT 'A',
 CONSTRAINT Pk_Id_Instit PRIMARY KEY (Id)
 );
 
@@ -29,6 +32,7 @@ CREATE TABLE Transparencia (
 	Periodicidade VARCHAR(80) NOT NULL,
 	DtPrevEntr DATE NOT NULL,
 	DtEntrega DATE,
+	Status CHAR(1) DEFAULT 'A',
 CONSTRAINT Pk_Id_Transpparencia PRIMARY KEY (Id),
 CONSTRAINT Fk_Id_Demonst FOREIGN KEY (Id_Demonst) REFERENCES Demonstrativo (Id)
 );
@@ -42,6 +46,7 @@ CREATE TABLE BalanceteCFOAB (
 	DtPrevEntr DATE NOT NULL,
 	DtEntrega DATE,
 	Eficiencia INT,
+	Status CHAR(1) DEFAULT 'A',
 CONSTRAINT Pk_Id_BalancCFOAB PRIMARY KEY (Id),
 CONSTRAINT Fk_Id_DemonstBal FOREIGN KEY (Id_Demonst) REFERENCES Demonstrativo (Id)
 );
@@ -58,6 +63,7 @@ CREATE TABLE PagamentoCotas (
 	ValorPago DECIMAL(19,2),
 	DtPagto DATE,
 	Observacao VARCHAR(255),
+	Status CHAR(1) DEFAULT 'A',
 CONSTRAINT Pk_Id_PagtoCotas PRIMARY KEY (Id),
 CONSTRAINT Fk_Id_Instit FOREIGN KEY (Id_Instit) REFERENCES Instituicao (Id)
 );
@@ -73,7 +79,7 @@ CREATE TABLE PrestacaoContasSubseccional (
 	ValorPago DECIMAL(19,2),
 	Eficiencia INT,
 	Observacao VARCHAR(255),
-	Status VARCHAR(1),
+	Status CHAR(1) DEFAULT 'A',
 CONSTRAINT Pk_Id_PrestContasSub PRIMARY KEY (Id),
 CONSTRAINT FK_Id_SubsecPrestCont FOREIGN KEY (Id_Subseccional) REFERENCES Subseccional (Id)
 );
@@ -87,6 +93,7 @@ CREATE TABLE BaseOrcamentaria(
 	DtLancto DATE NOT NULL,
 	Ano INT NOT NULL,
 	Tipo VARCHAR(50) NOT NULL,
+	Status CHAR(1) DEFAULT 'A',
 CONSTRAINT Pk_Id_BaseOrc PRIMARY KEY (Id)
 );
 
@@ -104,10 +111,13 @@ INSERT INTO Perfis (Nome) VALUES
 CREATE TABLE Usuarios (
     Id INT IDENTITY(1,1) PRIMARY KEY,
     Nome VARCHAR(100) NOT NULL,
+    NomeUsuario VARCHAR(100), 
     Email VARCHAR(100) NOT NULL UNIQUE,
     Senha VARCHAR(255) NOT NULL,
     Id_Perfil INT NOT NULL,
-    CONSTRAINT FK_Id_Perfil FOREIGN KEY (Id_Perfil) REFERENCES Perfis(Id)
+    Status CHAR(1) DEFAULT 'A',
+    CONSTRAINT FK_Id_Perfil FOREIGN KEY (Id_Perfil) REFERENCES Perfis(Id),
+    CONSTRAINT UQ_NomeUsuario UNIQUE (NomeUsuario) 
 );
 
 CREATE TABLE Permissoes (
@@ -117,7 +127,7 @@ CREATE TABLE Permissoes (
     P_Create BIT DEFAULT 0,           
     P_Read BIT DEFAULT 0,           
     P_Update BIT DEFAULT 0,          
-    P_Delete BIT DEFAULT 0,           
+    P_Delete BIT DEFAULT 0,         
     CONSTRAINT FK_Permissao_Perfil FOREIGN KEY (Id_Perfil) REFERENCES Perfis(Id)
 );
 
@@ -168,13 +178,3 @@ VALUES
 (4, 'PrestacaoContasSubseccional', 0, 1, 0, 0),
 (4, 'BaseOrcamentaria', 0, 1, 0, 0),
 (4, 'Usuarios', 0, 1, 0, 0);
-
-ALTER TABLE Subseccional ADD Status CHAR(1) DEFAULT 'A';
-ALTER TABLE Demonstrativo ADD Status CHAR(1) DEFAULT 'A';
-ALTER TABLE Instituicao ADD Status CHAR(1) DEFAULT 'A';
-ALTER TABLE Transparencia ADD Status CHAR(1) DEFAULT 'A';
-ALTER TABLE BalanceteCFOAB ADD Status CHAR(1) DEFAULT 'A';
-ALTER TABLE PagamentoCotas ADD Status CHAR(1) DEFAULT 'A';
-ALTER TABLE PrestacaoContasSubseccional ADD Status CHAR(1) DEFAULT 'A';
-ALTER TABLE BaseOrcamentaria ADD Status CHAR(1) DEFAULT 'A';
-ALTER TABLE Usuarios ADD Status CHAR(1) DEFAULT 'A';
