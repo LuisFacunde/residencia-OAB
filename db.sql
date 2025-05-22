@@ -1,3 +1,5 @@
+DROP DATABASE IF EXISTS DM_TI_FINANCEIRO;
+
 CREATE DATABASE DM_TI_FINANCEIRO;
 
 USE DM_TI_FINANCEIRO;
@@ -129,15 +131,6 @@ CREATE TABLE Permissoes (
     P_Update BIT DEFAULT 0,          
     P_Delete BIT DEFAULT 0,         
     CONSTRAINT FK_Permissao_Perfil FOREIGN KEY (Id_Perfil) REFERENCES Perfis(Id)
-);
-
-CREATE TABLE LogAtividade (
-	Id INT IDENTITY(1,1) PRIMARY KEY,
-	Tabela VARCHAR(50) NOT NULL,
-	Acao VARCHAR(10) NOT NULL,           
-	Id_Registro INT,
-	NomeUsuario VARCHAR(100) NOT NULL,
-	DataHora DATETIME DEFAULT GETDATE()
 );
 
 INSERT INTO Permissoes (Id_Perfil, Modulo, P_Create, P_Read, P_Update, P_Delete)
