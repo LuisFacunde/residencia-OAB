@@ -35,13 +35,28 @@ def criar_usuario():
     nome = data.get('nome')
     email = data.get('email')
     senha = data.get('senha')
-    id_perfil = data.get('id_perfil')
+    nome_perfil = data.get('perfil')  
+    setor = data.get('setor')      
+    cargo = data.get('cargo')     
+    permissoes = data.get('permissoes', [])  
 
-    if usuario_model.verificar_email_existente(email):
-        return jsonify({'erro': 'E-mail já cadastrado'}), 400
+    if not all([nome, email, senha, nome_perfil]):
+        return jsonify({'erro': 'Campos obrigatórios ausentes'}), 400
 
-    usuario_model.cadastrar_usuario(nome, email, senha, id_perfil)
-    return jsonify({'mensagem': 'Usuário cadastrado com sucesso'}), 201
+    resultado = usuario_model.cadastrar_usuario_com_permissoes(
+        nome=nome,
+        email=email,
+        senha=senha,
+        nome_perfil=nome_perfil,
+        permissoes=permissoes,
+        setor=setor,
+        cargo=cargo
+    )
+
+    if "erro" in resultado:
+        return jsonify(resultado), 400
+
+    return jsonify(resultado), 201
 
 @app.route('/usuarios/<email>', methods=['PUT'])
 def editar_usuario(email):
