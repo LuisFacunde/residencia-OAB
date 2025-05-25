@@ -1,5 +1,3 @@
-DROP DATABASE IF EXISTS DM_TI_FINANCEIRO;
-
 CREATE DATABASE DM_TI_FINANCEIRO;
 
 USE DM_TI_FINANCEIRO;
@@ -99,84 +97,65 @@ CREATE TABLE BaseOrcamentaria(
 CONSTRAINT Pk_Id_BaseOrc PRIMARY KEY (Id)
 );
 
-CREATE TABLE Perfis (
-    Id INT IDENTITY(1,1) PRIMARY KEY,
-    Nome VARCHAR(50) NOT NULL UNIQUE
-);
-
-INSERT INTO Perfis (Nome) VALUES 
-('Admin'),
-('Leitura'),
-('Escrita'),
-('Auditoria');
-
 CREATE TABLE Usuarios (
     Id INT IDENTITY(1,1) PRIMARY KEY,
     Nome VARCHAR(100) NOT NULL,
     NomeUsuario VARCHAR(100), 
     Email VARCHAR(100) NOT NULL UNIQUE,
     Senha VARCHAR(255) NOT NULL,
+    Setor VARCHAR(100),
+    Cargo VARCHAR(100),
     Id_Perfil INT NOT NULL,
     Status CHAR(1) DEFAULT 'A',
     CONSTRAINT FK_Id_Perfil FOREIGN KEY (Id_Perfil) REFERENCES Perfis(Id),
     CONSTRAINT UQ_NomeUsuario UNIQUE (NomeUsuario) 
 );
 
+CREATE TABLE Perfis (
+    Id INT IDENTITY(1,1) PRIMARY KEY,
+    Nome VARCHAR(50) NOT NULL UNIQUE
+);
+
+INSERT INTO Perfis (Nome) VALUES ('Admin');
+
+CREATE TABLE Modulos (
+    Id INT IDENTITY(1,1) PRIMARY KEY,
+    Nome VARCHAR(50) NOT NULL UNIQUE
+);
+
+INSERT INTO Modulos (Nome) VALUES 
+('Subseccional'),
+('Demonstrativo'),
+('Instituicao'),
+('Transparencia'),
+('BalanceteCFOAB'),
+('PagamentoCotas'),
+('PrestacaoContasSubseccional'),
+('BaseOrcamentaria'),
+('Usuarios'),
+('Perfis');
+
 CREATE TABLE Permissoes (
     Id INT IDENTITY(1,1) PRIMARY KEY,
     Id_Perfil INT NOT NULL,
-    Modulo VARCHAR(50) NOT NULL,        
-    P_Create BIT DEFAULT 0,           
-    P_Read BIT DEFAULT 0,           
-    P_Update BIT DEFAULT 0,          
-    P_Delete BIT DEFAULT 0,         
-    CONSTRAINT FK_Permissao_Perfil FOREIGN KEY (Id_Perfil) REFERENCES Perfis(Id)
+    Id_Modulo INT NOT NULL,
+    P_Create BIT DEFAULT 0,
+    P_Read   BIT DEFAULT 0,
+    P_Update BIT DEFAULT 0,
+    P_Delete BIT DEFAULT 0,
+    FOREIGN KEY (Id_Perfil) REFERENCES Perfis(Id),
+    FOREIGN KEY (Id_Modulo) REFERENCES Modulos(Id)
 );
 
-INSERT INTO Permissoes (Id_Perfil, Modulo, P_Create, P_Read, P_Update, P_Delete)
-VALUES 
-(1, 'Subseccional', 1, 1, 1, 1),
-(1, 'Demonstrativo', 1, 1, 1, 1),
-(1, 'Instituicao', 1, 1, 1, 1),
-(1, 'Transparencia', 1, 1, 1, 1),
-(1, 'BalanceteCFOAB', 1, 1, 1, 1),
-(1, 'PagamentoCotas', 1, 1, 1, 1),
-(1, 'PrestacaoContasSubseccional', 1, 1, 1, 1),
-(1, 'BaseOrcamentaria', 1, 1, 1, 1),
-(1, 'Usuarios', 1, 1, 1, 1);
-
-INSERT INTO Permissoes (Id_Perfil, Modulo, P_Create, P_Read, P_Update, P_Delete)
-VALUES 
-(2, 'Subseccional', 0, 1, 0, 0),
-(2, 'Demonstrativo', 0, 1, 0, 0),
-(2, 'Instituicao', 0, 1, 0, 0),
-(2, 'Transparencia', 0, 1, 0, 0),
-(2, 'BalanceteCFOAB', 0, 1, 0, 0),
-(2, 'PagamentoCotas', 0, 1, 0, 0),
-(2, 'PrestacaoContasSubseccional', 0, 1, 0, 0),
-(2, 'BaseOrcamentaria', 0, 1, 0, 0),
-(2, 'Usuarios', 0, 1, 0, 0);
-
-INSERT INTO Permissoes (Id_Perfil, Modulo, P_Create, P_Read, P_Update, P_Delete)
-VALUES 
-(3, 'Subseccional', 1, 1, 1, 0),
-(3, 'Demonstrativo', 1, 1, 1, 0),
-(3, 'Instituicao', 1, 1, 1, 0),
-(3, 'Transparencia', 1, 1, 1, 0),
-(3, 'BalanceteCFOAB', 1, 1, 1, 0),
-(3, 'PagamentoCotas', 1, 1, 1, 0),
-(3, 'PrestacaoContasSubseccional', 1, 1, 1, 0),
-(3, 'BaseOrcamentaria', 1, 1, 1, 0),
-(3, 'Usuarios', 1, 1, 1, 0);
-
-INSERT INTO Permissoes (Id_Perfil, Modulo, P_Create, P_Read, P_Update, P_Delete)
-VALUES 
-(4, 'Subseccional', 0, 1, 0, 0),
-(4, 'Demonstrativo', 0, 1, 0, 0),
-(4, 'Instituicao', 0, 1, 0, 0),
-(4, 'Transparencia', 0, 1, 0, 0),
-(4, 'BalanceteCFOAB', 0, 1, 0, 0),
-(4, 'PagamentoCotas', 0, 1, 0, 0),
-(4, 'PrestacaoContasSubseccional', 0, 1, 0, 0),
-(4, 'BaseOrcamentaria', 0, 1, 0, 0),
-(4, 'Usuarios', 0, 1, 0, 0);
+-- Perfil Admin
+INSERT INTO Permissoes (Id_Perfil, Id_Modulo, P_Create, P_Read, P_Update, P_Delete) VALUES
+(1, 1, 1, 1, 1, 1),
+(1, 2, 1, 1, 1, 1),
+(1, 3, 1, 1, 1, 1),
+(1, 4, 1, 1, 1, 1),
+(1, 5, 1, 1, 1, 1),
+(1, 6, 1, 1, 1, 1),
+(1, 7, 1, 1, 1, 1),
+(1, 8, 1, 1, 1, 1),
+(1, 9, 1, 1, 1, 1),
+(1,10, 1, 1, 1, 1);
