@@ -57,20 +57,6 @@ def obter_ou_criar_perfil(nome_perfil):
     conn.close()
     return perfil_id
 
-def obter_ou_criar_modulo(nome_modulo):
-    conn = conectar()
-    cursor = conn.cursor()
-    cursor.execute("SELECT Id FROM Modulos WHERE Nome = ?", (nome_modulo,))
-    row = cursor.fetchone()
-    if row:
-        modulo_id = row[0]
-    else:
-        cursor.execute("INSERT INTO Modulos (Nome) VALUES (?)", (nome_modulo,))
-        conn.commit()
-        modulo_id = cursor.lastrowid
-    conn.close()
-    return modulo_id
-
 def cadastrar_usuario_com_permissoes(nome, email, senha, nome_perfil, permissoes, setor=None, cargo=None):
     if verificar_email_existente(email):
         return {"erro": "E-mail já cadastrado."}
@@ -86,26 +72,24 @@ def cadastrar_usuario_com_permissoes(nome, email, senha, nome_perfil, permissoes
         INSERT INTO Usuarios (Nome, NomeUsuario, Email, Senha, Setor, Cargo, Id_Perfil, Status)
         VALUES (?, ?, ?, ?, ?, ?, ?, 'A')
     """, (nome, nome_usuario, email, senha_hash, setor, cargo, perfil_id))
-    conn.commit()
 
     for p in permissoes:
-        nome_modulo = p.get("modulo")
         p_create = int(p.get("create", 0))
         p_read   = int(p.get("read", 0))
         p_update = int(p.get("update", 0))
         p_delete = int(p.get("delete", 0))
 
-        modulo_id = obter_ou_criar_modulo(nome_modulo)
-
         cursor.execute("""
-            SELECT 1 FROM Permissoes WHERE Id_Perfil = ? AND Id_Modulo = ?
-        """, (perfil_id, modulo_id))
+            SELECT 1 FROM Permissoes WHERE Id_Perfil = ?
+        """, (perfil_id,))
+
         if cursor.fetchone() is None:
             cursor.execute("""
-                INSERT INTO Permissoes (Id_Perfil, Id_Modulo, P_Create, P_Read, P_Update, P_Delete)
-                VALUES (?, ?, ?, ?, ?, ?)
-            """, (perfil_id, modulo_id, p_create, p_read, p_update, p_delete))
+                INSERT INTO Permissoes (Id_Perfil, P_Create, P_Read, P_Update, P_Delete)
+                VALUES (?, ?, ?, ?, ?)
+            """, (perfil_id, p_create, p_read, p_update, p_delete))
 
     conn.commit()
     conn.close()
     return {"sucesso": "Usuário cadastrado com sucesso."}
+
