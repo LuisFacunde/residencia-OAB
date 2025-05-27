@@ -1,5 +1,3 @@
-DROP DATABASE IF EXISTS DM_TI_FINANCEIRO;
-
 CREATE DATABASE DM_TI_FINANCEIRO;
 
 USE DM_TI_FINANCEIRO;
@@ -145,7 +143,8 @@ VALUES
 (1, 'PagamentoCotas', 1, 1, 1, 1),
 (1, 'PrestacaoContasSubseccional', 1, 1, 1, 1),
 (1, 'BaseOrcamentaria', 1, 1, 1, 1),
-(1, 'Usuarios', 1, 1, 1, 1);
+(1, 'Usuarios', 1, 1, 1, 1),
+(1, 'CriarTabela', 1, 0, 0, 0);
 
 INSERT INTO Permissoes (Id_Perfil, Modulo, P_Create, P_Read, P_Update, P_Delete)
 VALUES 
