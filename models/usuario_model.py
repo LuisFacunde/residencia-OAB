@@ -66,6 +66,9 @@ def cadastrar_usuario_com_permissoes(nome, email, senha, nome_perfil, permissoes
     perfil_id = obter_ou_criar_perfil(nome_perfil)
 
     conn = conectar()
+    if conn is None:
+        return {"erro": "Erro de conexão com o banco."}
+
     cursor = conn.cursor()
 
     cursor.execute("""
@@ -74,20 +77,24 @@ def cadastrar_usuario_com_permissoes(nome, email, senha, nome_perfil, permissoes
     """, (nome, nome_usuario, email, senha_hash, setor, cargo, perfil_id))
 
     for p in permissoes:
+        modulo = p.get("modulo")
+        if not modulo:
+            continue 
+
         p_create = int(p.get("create", 0))
         p_read   = int(p.get("read", 0))
         p_update = int(p.get("update", 0))
         p_delete = int(p.get("delete", 0))
 
         cursor.execute("""
-            SELECT 1 FROM Permissoes WHERE Id_Perfil = ?
-        """, (perfil_id,))
+            SELECT 1 FROM Permissoes WHERE Id_Perfil = ? AND Modulo = ?
+        """, (perfil_id, modulo))
 
         if cursor.fetchone() is None:
             cursor.execute("""
-                INSERT INTO Permissoes (Id_Perfil, P_Create, P_Read, P_Update, P_Delete)
-                VALUES (?, ?, ?, ?, ?)
-            """, (perfil_id, p_create, p_read, p_update, p_delete))
+                INSERT INTO Permissoes (Id_Perfil, Modulo, P_Create, P_Read, P_Update, P_Delete)
+                VALUES (?, ?, ?, ?, ?, ?)
+            """, (perfil_id, modulo, p_create, p_read, p_update, p_delete))
 
     conn.commit()
     conn.close()
