@@ -2,7 +2,7 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 from models import usuario_model, permissoes_model, instituicao_model, subseccional_model, demonstrativo_model
 from models import transparencia_model, balancete_model, pagamentoCotas_model, prestacaoContasSubsecciona_model
-from models import baseOrcamentaria_model
+from models import baseOrcamentaria_model, tabela_dinamica_model
 
 app = Flask(__name__)
 CORS(app)
@@ -131,6 +131,9 @@ def criar_subseccional():
 
     if not permissoes_model.verificar_permissao(perfil, 'Subseccional', 'C'):
         return jsonify({"erro": "Sem permissão para criação"}), 403
+
+    if not descricao or not id_usuario:
+        return jsonify({"erro": "Campos obrigatórios não informados"}), 400
 
     subseccional_model.criar_subseccional(descricao, id_usuario)
     return jsonify({"mensagem": "Subseccional criada com sucesso"}), 201
@@ -512,6 +515,33 @@ def deletar_lancamentos(id):
 
     baseOrcamentaria_model.inativar_lancamento(id)
     return jsonify({"mensagem": "Lançamento inativado com sucesso"})
+
+#Criar Tabela Dinâmica
+@app.route('/criar_tabela', methods=['POST'])
+def criar_tabela():
+    perfil = request.headers.get('perfil')
+
+    if not permissoes_model.verificar_permissao(perfil, 'CriarTabela', 'C'):
+        return jsonify({"erro": "Sem permissão para criar tabelas"}), 403
+
+    data = request.json
+    nome_tabela = data.get('nome_tabela')
+    colunas = data.get('colunas')  
+
+    if not nome_tabela or not colunas:
+        return jsonify({"erro": "Nome da tabela e colunas são obrigatórios"}), 400
+
+    def criar_nova_tabela(nome_tabela, colunas):
+        try:
+            return tabela_dinamica_model.criar_nova_tabela(nome_tabela, colunas)
+        except Exception as e:
+            return {'erro': str(e)}
+
+    resultado = criar_nova_tabela(nome_tabela, colunas)
+    if 'erro' in resultado:
+        return jsonify(resultado), 400
+
+    return jsonify({"mensagem": "Tabela criada com sucesso"}), 201
 
 if __name__ == '__main__':
     app.run(debug=True)
