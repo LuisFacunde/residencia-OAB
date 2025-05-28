@@ -35,12 +35,11 @@ def criar_usuario():
     nome = data.get('nome')
     email = data.get('email')
     senha = data.get('senha')
-    nome_perfil = data.get('perfil')  # Ex: "Admin", "Escrita", etc.
-    setor = data.get('setor')         # Novo campo
-    cargo = data.get('cargo')         # Novo campo
-    permissoes = data.get('permissoes', [])  # Lista de permissões
+    nome_perfil = data.get('perfil')
+    setor = data.get('setor')
+    cargo = data.get('cargo') 
+    permissoes = data.get('permissoes', [])
 
-    # Validar campos obrigatórios
     if not all([nome, email, senha, nome_perfil]):
         return jsonify({'erro': 'Campos obrigatórios ausentes'}), 400
 
@@ -91,7 +90,7 @@ def listar_instituicao():
     if not permissoes_model.verificar_permissao(perfil, 'Instituicao', 'R'):
         return jsonify({"erro": "Sem permissão para listar instituições"}), 403
 
-    dados = instituicao_model.listar_instituicao()
+    dados = instituicao_model.listar_instituicoes()
     return jsonify(dados)
 
 @app.route('/instituicao', methods=['POST'])
@@ -119,7 +118,7 @@ def listar_subseccionais():
     if not permissoes_model.verificar_permissao(perfil, 'Subseccional', 'R'):
         return jsonify({"erro": "Sem permissão para leitura"}), 403
 
-    dados = subseccional_model.listar_subseccional()
+    dados = subseccional_model.listar_subseccionais()
     return jsonify(dados)
 
 @app.route('/subseccional', methods=['POST'])
