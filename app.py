@@ -85,13 +85,13 @@ def excluir_usuario(email):
 
 #Instituição
 @app.route('/instituicao', methods=['GET'])
-def listar_instituicao():
+def listar_instituicoes():
     perfil = request.headers.get('perfil')
 
     if not permissoes_model.verificar_permissao(perfil, 'Instituicao', 'R'):
         return jsonify({"erro": "Sem permissão para listar instituições"}), 403
 
-    dados = instituicao_model.listar_instituicao()
+    dados = instituicao_model.listar_instituicoes()
     return jsonify(dados)
 
 @app.route('/instituicao', methods=['POST'])
@@ -119,7 +119,7 @@ def listar_subseccionais():
     if not permissoes_model.verificar_permissao(perfil, 'Subseccional', 'R'):
         return jsonify({"erro": "Sem permissão para leitura"}), 403
 
-    dados = subseccional_model.listar_subseccional()
+    dados = subseccional_model.listar_subseccionais()
     return jsonify(dados)
 
 @app.route('/subseccional', methods=['POST'])
