@@ -14,9 +14,12 @@ export const Subseccional = () => {
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [descricao, setDescricao] = useState("");
 
+  var usuario = JSON.parse(localStorage.getItem('usuario'));
+  var perfil = usuario?.perfil;
+
   const colDefs = [
     { field: "id", headerName: "ID", sortable: true, filter: true },
-    { field: "descricao", headerName: "Nome da Subseccional", sortable: true, filter: true, editable: true },
+    { field: "descricao", headerName: "Nome da Subseccional", sortable: true, filter: true },
   ];
 
   const defaultColDef = {
@@ -30,7 +33,7 @@ export const Subseccional = () => {
       const res = await fetch("http://127.0.0.1:5000/subseccional", {
         method: "GET",
         headers: {
-          perfil: "Admin",
+          perfil: perfil,
         },
       });
       const data = await res.json();
@@ -45,13 +48,15 @@ export const Subseccional = () => {
   }, []);
 
   const handleCreate = async () => {
-    var id_usuario = 2;
+    var usuario = JSON.parse(localStorage.getItem('usuario'));
+    var id_usuario = usuario?.id;
+    console.log(id_usuario);
     try {
       const res = await fetch("http://127.0.0.1:5000/subseccional", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          perfil: "Admin",
+          perfil: perfil,
         },
         body: JSON.stringify({ 
             descricao,

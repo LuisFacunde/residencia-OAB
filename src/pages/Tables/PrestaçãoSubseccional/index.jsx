@@ -25,17 +25,20 @@ export const PrestacaoSubseccional = () => {
   const [eficiencia, setEficiencia] = useState('');
   const [observacao, setObservacao] = useState('');
 
+  var usuario = JSON.parse(localStorage.getItem('usuario'));
+  var perfil = usuario?.perfil;
+
   const colDefs = [
-    { field: "id", headerName: "ID", sortable: true },
-    { field: "subseccional", headerName: "Subseccional", flex: 1 },
-    { field: "mes_ref", headerName: "Mês Ref." },
-    { field: "ano_ref", headerName: "Ano Ref." },
-    { field: "dt_prev_entr", headerName: "Previsão Entrega" },
-    { field: "dt_entrega", headerName: "Data Entrega" },
-    { field: "dt_pagto", headerName: "Data Pagamento" },
-    { field: "valor_pago", headerName: "Valor Pago" },
-    { field: "eficiencia", headerName: "Eficiência" },
-    { field: "observacao", headerName: "Observação", flex: 1 }
+    { field: "id", headerName: "ID", sortable: true, filter: true, },
+    { field: "subseccional", headerName: "Subseccional", flex: 1, sortable: true, filter: true, },
+    { field: "mes_ref", headerName: "Mês Ref.", sortable: true, filter: true, },
+    { field: "ano_ref", headerName: "Ano Ref.", sortable: true, filter: true, },
+    { field: "dt_prev_entr", headerName: "Previsão Entrega", sortable: true, filter: true, },
+    { field: "dt_entrega", headerName: "Data Entrega", sortable: true, filter: true, },
+    { field: "dt_pagto", headerName: "Data Pagamento", sortable: true, filter: true, },
+    { field: "valor_pago", headerName: "Valor Pago", sortable: true, filter: true, },
+    { field: "eficiencia", headerName: "Eficiência", sortable: true, filter: true, },
+    { field: "observacao", headerName: "Observação", flex: 1, sortable: true, filter: true, }
   ];
 
   const defaultColDef = {
@@ -47,7 +50,7 @@ export const PrestacaoSubseccional = () => {
   const fetchData = async () => {
     try {
       const res = await fetch("http://127.0.0.1:5000/prestacoes", {
-        headers: { perfil: "Admin" },
+        headers: { perfil: perfil },
       });
       const data = await res.json();
       setRowData(data);
@@ -79,7 +82,7 @@ export const PrestacaoSubseccional = () => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          perfil: "Admin",
+          perfil: perfil,
         },
         body: JSON.stringify({
           id_subseccional: parseInt(idSubseccional),
@@ -120,7 +123,7 @@ export const PrestacaoSubseccional = () => {
       <div className="flex justify-between mb-4">
         <button
           onClick={() => setIsCreateOpen(true)}
-          className="bg-green-600 text-white px-4 py-2 rounded-md"
+          className="bg-blue-600 text-white px-4 py-2 rounded-md"
         >
           Adicionar Prestação
         </button>

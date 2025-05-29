@@ -5,16 +5,24 @@ import logo from "../../../assets/logoOab.svg"
 import painel from "../../../assets/painelIcon.svg"
 import tabela from "../../../assets/tabelaIcon.svg"
 
-const tables = ["Instituição", "Subseccional", "Demonstrativo" ,"Transparência", "BalanceteCFOAB" ,"Pagamento Contas", "Prestação Subseccional"]
+const tables = ["Instituição", "Subseccional", "Demonstrativo" ,"Transparência", "BalanceteCFOAB" ,"PagamentoContas", "PrestaçãoSubseccional", "BaseOrçamentaria"]
 
 export const Layout = () => {
+    const handleLogout = () => {
+        localStorage.removeItem('usuario');
+        navigate('/');
+      };
+
+      var usuario = JSON.parse(localStorage.getItem('usuario'));
+      var nome_usuario = usuario?.nome;
+
     return(
         <div className="bg-[#F5F5F9] flex">
             <div className="relative h-[100vh] w-[300px] bg-[#062360]">
                 <Link to="/" className="absolute left-6 bottom-10  max-[400px]:p-4">
-                    <p className="flex cursor-pointer text-[#D5D5D5] text-center gap-2 max-[400px]:text-[16px] max-[340px]:text-[14px]">
-                    <img src="/src/assets/arrow-left.svg" alt="" /> Voltar ao menu
-                    </p>
+                    <button onClick={handleLogout} className="flex cursor-pointer text-[#D5D5D5] text-center border-0 gap-2 max-[400px]:text-[16px] max-[340px]:text-[14px]">
+                        <img src="/src/assets/arrow-left.svg" alt="" /> Voltar ao menu
+                    </button>
                 </Link>
                 <Link to="/" className="w-[100%] py-[30px] pb-[11px] flex justify-center items-center">
                     <img src={logo} alt="logo oab" />
@@ -51,7 +59,7 @@ export const Layout = () => {
 
             <div className="w-[calc(100%-300px)]">
                 <div className="fixed px-16 py-6 text-[33px] z-50 w-[calc(100%-300px)] bg-white border-b-[1px] border-[#CFCFCF] shadow-md flex justify-between ">
-                    <p className="flex gap-1.5 items-center">Olá, Caio <img className="w-[40px] h-[40px]" src={hand} alt="hand icon" /></p>
+                    <p className="flex gap-1.5 items-center">Olá, {nome_usuario} <img className="w-[40px] h-[40px]" src={hand} alt="hand icon" /></p>
                     <img src={profile} alt="profile pic" />
                 </div>
                 <div className="mt-[99px] px-16 py-[40px]">

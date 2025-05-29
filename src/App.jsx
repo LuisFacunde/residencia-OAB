@@ -10,25 +10,28 @@ import { Transparencia } from "./pages/Tables/Transparencia";
 import { BalanceteCFOAB } from "./pages/Tables/BalanceteCFOAB";
 import { PagamentoContas } from "./pages/Tables/PagamentoContas";
 import { PrestacaoSubseccional } from "./pages/Tables/PrestaçãoSubseccional";
+import { PrivateRoute } from "./components/PrivateRoute";
+import { BaseOrcamentaria } from "./pages/Tables/BaseOrcamentaria";
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
         <Route index element={<Authentication />} />
-
-        {/* pagina para teste de modal - Coraline. */}
         <Route path="modal" element={<ModalTest/>} />
-
-        <Route element={<Layout />}>
-          <Route path="/administrativo" element={<PainelAdm />} />
-          <Route path="/tabelas/Instituição" element={<Instituicao/>} />
-          <Route path="/tabelas/Subseccional" element={<Subseccional/>} />
-          <Route path="/tabelas/Demonstrativo" element={<Demonstrativo/>} />
-          <Route path="/tabelas/Transparência" element={<Transparencia/>} />
-          <Route path="/tabelas/BalanceteCFOAB" element={<BalanceteCFOAB/>} />
-          <Route path="/tabelas/Pagamento Contas" element={<PagamentoContas/>} />
-          <Route path="/tabelas/Prestação Subseccional" element={<PrestacaoSubseccional/>} />
+      
+        <Route element={<PrivateRoute />}>
+          <Route element={<Layout />}>
+            <Route path="/administrativo" element={<PainelAdm />} />
+            <Route path="/tabelas/Instituição" element={<Instituicao />} />
+            <Route path="/tabelas/Subseccional" element={<Subseccional />} />
+            <Route path="/tabelas/Demonstrativo" element={<Demonstrativo />} />
+            <Route path="/tabelas/Transparência" element={<Transparencia />} />
+            <Route path="/tabelas/BalanceteCFOAB" element={<BalanceteCFOAB />} />
+            <Route path="/tabelas/PagamentoContas" element={<PagamentoContas />} />
+            <Route path="/tabelas/PrestaçãoSubseccional" element={<PrestacaoSubseccional />} />
+            <Route path="/tabelas/BaseOrçamentaria" element={<BaseOrcamentaria />} />
+          </Route>
         </Route>
       </Routes>
     </BrowserRouter>

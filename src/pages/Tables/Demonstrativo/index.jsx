@@ -2,7 +2,6 @@ import React, { useEffect, useRef, useState, useCallback } from "react";
 import { AllCommunityModule, ModuleRegistry } from "ag-grid-community";
 import { AgGridReact } from "ag-grid-react";
 import { Modal1 } from "../../../components/Modal1";
-import { ModalInput } from "../../../components/ModalInput";
 import { ModalIcon } from "../../../components/ModalIcon";
 import { ModalButtons } from "../../../components/ModalButtons";
 import instituicaoIcon from "../../../assets/painelIcon.svg";
@@ -15,10 +14,12 @@ export const Demonstrativo = () => {
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [descricao, setDescricao] = useState('');
 
+  var usuario = JSON.parse(localStorage.getItem('usuario'));
+  var perfil = usuario?.perfil;
 
   const colDefs = [
     { field: "id", headerName: "ID", sortable: true, filter: true },
-    { field: "descricao", headerName: "Nome da Instituição", sortable: true, filter: true, editable: true },
+    { field: "descricao", headerName: "Nome da Demonstrativo", sortable: true, filter: true },
   ];
 
   const defaultColDef = {
@@ -32,7 +33,7 @@ export const Demonstrativo = () => {
       const res = await fetch("http://127.0.0.1:5000/demonstrativo", {
         method: "GET",
         headers: {
-          "perfil": "Admin",
+          "perfil": perfil,
         },
       });
       const data = await res.json();
@@ -47,6 +48,8 @@ export const Demonstrativo = () => {
     fetchData();
   }, []);
 
+  
+
   const handleCreate = async () => {
     console.log(descricao);
     try {
@@ -54,7 +57,7 @@ export const Demonstrativo = () => {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
-            "perfil": "Admin",
+            "perfil": perfil,
           },
         body: JSON.stringify({ descricao })
       });

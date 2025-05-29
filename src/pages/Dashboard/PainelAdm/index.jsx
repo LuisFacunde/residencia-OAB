@@ -2,62 +2,52 @@ import React, { StrictMode, useRef, useState, useCallback, useEffect } from "rea
 import { createRoot } from "react-dom/client";
 import { AllCommunityModule, ModuleRegistry } from "ag-grid-community";
 import { AgGridReact } from "ag-grid-react";
-
 import { themeAlpine } from 'ag-grid-community';
 import { Modal1 } from "../../../components/Modal1";
-import { ModalInput } from "../../../components/ModalInput";
 import { ModalIcon } from "../../../components/ModalIcon";
 import { ModalButtons } from "../../../components/ModalButtons";
 import modalIcon from "../../../assets/tabelaIcon.svg"
 import funcionarioIcon from "../../../assets/funcionarioIcon.svg"
+import { ModalInput2 } from "../../../components/ModalInput2";
 ModuleRegistry.registerModules([AllCommunityModule]);
+
+
 
 export const PainelAdm = () => {
   const gridRef = useRef();
   const [isFunOpen, setIsFunOpen] = useState(false);
-  const [isTableOpen, setIsTableOpen] = useState(false);
-  const [isCreateOpen, setIsCreateOpen] = useState(false);
-  const [isExportOpen, setIsExportOpen] = useState(false);
-  const [selectedOption, setSelectedOption] = useState('');
-  const [columns, setColumns] = useState(['']);
-  
+  const [quickFilterText, setQuickFilterText] = useState('');
+  const [filteredRowData, setFilteredRowData] = useState([]);
 
-    
-  const addColumn = () => {
-    setColumns([...columns, '']); 
-  };
+  // Estado para o formulário de funcionário
+  const [funcionarioData, setFuncionarioData] = useState({
+    nome: '',
+    email: '',
+    senha: '',
+    perfil: '',
+    setor: '',
+    cargo: ''
+  });
 
-  const handleColumnChange = (index, value) => {
-    const newColumns = [...columns];
-    newColumns[index] = value;
-    setColumns(newColumns);
-  };
-  const [rowData, setRowData] = useState([
+  // Estado para módulos de permissão
+  const [permissoes, setPermissoes] = useState([
+    { modulo: 'Subseccional', create: false, read: false, update: false, delete: false },
+    { modulo: 'Demonstrativo', create: false, read: false, update: false, delete: false },
+    { modulo: 'Instituicao', create: false, read: false, update: false, delete: false },
+    { modulo: 'Transparencia', create: false, read: false, update: false, delete: false },
+    { modulo: 'BalanceteCFOAB', create: false, read: false, update: false, delete: false },
+    { modulo: 'PagamentoCotas', create: false, read: false, update: false, delete: false },
+    { modulo: 'PrestacaoContasSubseccional', create: false, read: false, update: false, delete: false },
+    { modulo: 'BaseOrcamentaria', create: false, read: false, update: false, delete: false },
+    { modulo: 'Usuarios', create: false, read: false, update: false, delete: false }
+  ]);
+
+  // Dados mockados para a tabela
+  const [rowData] = useState([
     { func: "Caio.Carvalho", Setor: "Advocacia", info1: "info extra?", info2: "info extra?", info3: "info extra?" },
     { func: "Arthur.Tavares", Setor: "Advocacia", info1: "info extra?", info2: "info extra?", info3: "info extra?" },
     { func: "Jamila.Lobo", Setor: "Advocacia", info1: "info extra?", info2: "info extra?", info3: "info extra?" },
-    { func: "Luiz.Facundes", Setor: "Advocacia", info1: "info extra?", info2: "info extra?", info3: "info extra?" },
-    { func: "Lucas.Deodato", Setor: "Advocacia", info1: "info extra?", info2: "info extra?", info3: "info extra?" },
-    { func: "Coraline", Setor: "Advocacia", info1: "info extra?", info2: "info extra?", info3: "info extra?" },
-    { func: "teste", Setor: "Advocacia", info1: "info extra?", info2: "info extra?", info3: "info extra?" },
-    { func: "teste", Setor: "Advocacia", info1: "info extra?", info2: "info extra?", info3: "info extra?" },
-    { func: "teste", Setor: "Advocacia", info1: "info extra?", info2: "info extra?", info3: "info extra?" },
-    { func: "teste", Setor: "Advocacia", info1: "info extra?", info2: "info extra?", info3: "info extra?" },
-    { func: "teste", Setor: "Advocacia", info1: "info extra?", info2: "info extra?", info3: "info extra?" },
-    { func: "teste", Setor: "Advocacia", info1: "info extra?", info2: "info extra?", info3: "info extra?" },
-    { func: "teste", Setor: "Advocacia", info1: "info extra?", info2: "info extra?", info3: "info extra?" },
-    { func: "teste", Setor: "Advocacia", info1: "info extra?", info2: "info extra?", info3: "info extra?" },
-    { func: "teste", Setor: "Advocacia", info1: "info extra?", info2: "info extra?", info3: "info extra?" },
-    { func: "teste", Setor: "Advocacia", info1: "info extra?", info2: "info extra?", info3: "info extra?" },
-    { func: "teste", Setor: "Advocacia", info1: "info extra?", info2: "info extra?", info3: "info extra?" },
-    { func: "teste", Setor: "Advocacia", info1: "info extra?", info2: "info extra?", info3: "info extra?" },
-    { func: "teste", Setor: "Advocacia", info1: "info extra?", info2: "info extra?", info3: "info extra?" },
-    { func: "teste", Setor: "Advocacia", info1: "info extra?", info2: "info extra?", info3: "info extra?" },
-    { func: "teste", Setor: "Advocacia", info1: "info extra?", info2: "info extra?", info3: "info extra?" },
-    { func: "teste", Setor: "Advocacia", info1: "info extra?", info2: "info extra?", info3: "info extra?" },
-    { func: "teste", Setor: "Advocacia", info1: "info extra?", info2: "info extra?", info3: "info extra?" },
-    { func: "teste", Setor: "Advocacia", info1: "info extra?", info2: "info extra?", info3: "info extra?" },
-    { func: "teste", Setor: "Advocacia", info1: "info extra?", info2: "info extra?", info3: "info extra?" },
+    { func: "Luiz.Facundes", Setor: "Advocacia", info1: "info extra?", info2: "info extra?", info3: "info extra?" }
   ]);
 
   const [colDefs] = useState([
@@ -66,7 +56,6 @@ export const PainelAdm = () => {
       headerName: "Funcionário",
       sortable: true,
       filter: true,
-      // floatingFilter: true,C
       editable: true,
       checkboxSelection: true,
     },
@@ -92,11 +81,7 @@ export const PainelAdm = () => {
     resizable: true,
   };
 
-  const rowHeight = 50;
-
-  const [quickFilterText, setQuickFilterText] = useState('');
-  const [filteredRowData, setFilteredRowData] = useState([]);
-
+  // Filtro de busca
   useEffect(() => {
     setFilteredRowData(rowData);
   }, [rowData]);
@@ -119,42 +104,102 @@ export const PainelAdm = () => {
     setFilteredRowData(filteredData);
   }, [rowData]);
 
-    const handleModalTable = () => {
-      if (selectedOption === 'hosting-small') {
-        setIsCreateOpen(true);
-      } else if (selectedOption === 'hosting-big') {
-        setIsExportOpen(true);
+  // Manipulador de mudança para os campos do formulário
+  const handleFuncionarioChange = (e) => {
+    const { name, value } = e.target;
+    setFuncionarioData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  // Manipulador para mudanças nas permissões
+  const handlePermissaoChange = (modulo, tipo) => {
+    setPermissoes(prev => prev.map(item => {
+      if (item.modulo === modulo) {
+        return { ...item, [tipo]: !item[tipo] };
       }
-      setIsTableOpen(false);
-    };
-    
+      return item;
+    }));
+  };
+
+  // Função para enviar os dados do funcionário
+  const criarFuncionario = async () => {
+    try {
+      if (!funcionarioData.nome || !funcionarioData.email || !funcionarioData.senha || !funcionarioData.perfil) {
+        throw new Error('Preencha todos os campos obrigatórios');
+      }
+
+      // Preparar as permissões no formato esperado pelo backend
+      const permissoesFormatadas = permissoes.map(modulo => ({
+        modulo: modulo.modulo,
+        create: modulo.create ? 1 : 0,
+        read: modulo.read ? 1 : 0,
+        update: modulo.update ? 1 : 0,
+        delete: modulo.delete ? 1 : 0
+      }));
+
+      const payload = {
+        ...funcionarioData,
+        permissoes: permissoesFormatadas
+      };
+      console.log(payload);
+      var usuario = JSON.parse(localStorage.getItem('usuario'));
+      var perfil = usuario?.perfil;
+
+      const response = await fetch('http://127.0.0.1:5000/usuarios', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'perfil': perfil
+        },
+        body: JSON.stringify(payload)
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.erro || 'Erro ao criar usuário');
+      }
+
+      alert('Funcionário criado com sucesso!');
+      setIsFunOpen(false);
+      
+      // Resetar o formulário
+      setFuncionarioData({
+        nome: '',
+        email: '',
+        senha: '',
+        perfil: '',
+        setor: '',
+        cargo: ''
+      });
+      
+      setPermissoes(permissoes.map(p => ({
+        ...p,
+        create: false,
+        read: false,
+        update: false,
+        delete: false
+      })));
+    } catch (error) {
+      console.error('Erro:', error);
+      alert(error.message || 'Erro ao criar funcionário');
+    }
+  };
+
   return (
     <div className="p-4">
       <div className="flex justify-between">
         <ul className="flex gap-3.5">
-            <li>
-                <button
-                    onClick={() => {
-                    const selectedNodes = gridRef.current.api.getSelectedNodes();
-                    const selectedData = selectedNodes.map(node => node.data);
-                    const updatedData = rowData.filter(row => !selectedData.includes(row));
-                    setRowData(updatedData);
-                    }}
-                    className="bg-red-500 text-white px-4 py-2 cursor-pointer rounded-[10px] mb-4"
-                    >
-                    Deletar linhas selecionadas
-                </button>
-            </li>
-            <li>
-                <button onClick={() => setIsFunOpen(true)} className="bg-[#C0090E] text-white px-4 py-2 cursor-pointer  rounded-[10px] mb-4">
-                    Adicionar Funcionario
-                </button>
-            </li>
-            <li>
-                <button onClick={() => setIsTableOpen(true)} className="bg-[#062360] text-white px-4 py-2 cursor-pointer  rounded-[10px] mb-4">
-                    Criar Tabela
-                </button>
-            </li>
+          <li>
+            <button 
+              onClick={() => setIsFunOpen(true)} 
+              className="bg-[#C0090E] text-white px-4 py-2 cursor-pointer rounded-[10px] mb-4"
+            >
+              Adicionar Funcionario
+            </button>
+          </li>
         </ul>
         <div className="w-[400px]">
           <div className="relative">
@@ -186,165 +231,140 @@ export const PainelAdm = () => {
           </div>
         </div>
       </div>
-              <Modal1 isOpen={isFunOpen} onClose={() => setIsFunOpen(false)}>
-                <ModalIcon image={funcionarioIcon}/>
-                <div className="flex flex-col gap-5">
 
-                    <div className="flex flex-col gap-1">
-                      <h2 className="text-xl font-bold">Criar Funcionario</h2>
-                      <p>Preencha os dados para cadastrar um novo funcionário no sistema da OAB.</p>
-                    </div>
+      {/* Modal de Criar Funcionário */}
+      <Modal1 isOpen={isFunOpen} onClose={() => setIsFunOpen(false)}>
+        <ModalIcon image={funcionarioIcon}/>
+        <div className="flex flex-col gap-4">
+          <div className="text-center mb-4">
+            <p className="text-gray-600">Preencha os dados para cadastrar um novo funcionário no sistema da OAB</p>
+          </div>
 
-                    <div className="flex flex-col gap-3">
-                      <ModalInput  label="Nome Completo" placeholder="Nome completo"  />
-                      <ModalInput  label="Setor" placeholder="Digite o setor"  />
-                    </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <ModalInput2 
+              label="Nome Completo*" 
+              placeholder="Nome completo"
+              name="nome"
+              value={funcionarioData.nome}
+              onChange={handleFuncionarioChange}
+            />
+            <ModalInput2 
+              label="Email*" 
+              placeholder="Email do funcionário"
+              type="email"
+              name="email"
+              value={funcionarioData.email}
+              onChange={handleFuncionarioChange}
+            />
+            <ModalInput2 
+              label="Senha*" 
+              placeholder="Senha temporária"
+              type="password"
+              name="senha"
+              value={funcionarioData.senha}
+              onChange={handleFuncionarioChange}
+            />
+            <ModalInput2 
+              label="Perfil*" 
+              placeholder="Perfil do usuário"
+              name="perfil"
+              value={funcionarioData.perfil}
+              onChange={handleFuncionarioChange}
+            />
+            <ModalInput2 
+              label="Setor" 
+              placeholder="Setor do funcionário"
+              name="setor"
+              value={funcionarioData.setor}
+              onChange={handleFuncionarioChange}
+            />
+            <ModalInput2 
+              label="Cargo" 
+              placeholder="Cargo do funcionário"
+              name="cargo"
+              value={funcionarioData.cargo}
+              onChange={handleFuncionarioChange}
+            />
+          </div>
 
-                    <div className="flex gap-3 mt-3">
-                      <ModalButtons text="Cancelar" onClick={() => setIsFunOpen(false)}/>
-                      <ModalButtons text="Confirmar" />
-                    </div>
-                </div>
-              </Modal1>
-              <Modal1 isOpen={isTableOpen} onClose={() => setIsTableOpen(false)}>
-                <div className="flex flex-col gap-5">
-                  <ModalIcon image={modalIcon}/>
-                  <div className="flex flex-col gap-0.5">
-                    <h1 className="text-[#181D27] font-bold text-[18px]">Criar Tabela</h1>
-                    <p className="text-[#535862] text-[14px]">Escolha a criação de tabela mais apropriada para o seu objetivo</p>
-                  </div>         
-                  <ul className="flex w-full gap-3 flex-col">
-                    <li>
-                      <input
-                        type="radio"
-                        id="hosting-small"
-                        name="hosting"
-                        value="hosting-small"
-                        className="hidden peer"
-                        checked={selectedOption === 'hosting-small'}
-                        onChange={(e) => setSelectedOption(e.target.value)}
-                        required
+          <div className="mt-6">
+            <h3 className="text-lg font-semibold text-gray-800 mb-3 pb-2 border-b border-gray-200">Permissões de Acesso</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-64 overflow-y-auto p-2">
+              {permissoes.map((modulo, index) => (
+                <div key={index} className="bg-white p-4 rounded-lg shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+                  <h4 className="font-medium text-gray-800 mb-3 flex items-center">
+                    <span className="w-3 h-3 bg-[#062360] rounded-full mr-2"></span>
+                    {modulo.modulo}
+                  </h4>
+                  <div className="grid grid-cols-2 gap-3">
+                    <label className="flex items-center space-x-2 cursor-pointer">
+                      <input 
+                        type="checkbox" 
+                        checked={modulo.create} 
+                        onChange={() => handlePermissaoChange(modulo.modulo, 'create')} 
+                        className="form-checkbox h-4 w-4 text-[#C0090E] rounded focus:ring-[#C0090E] border-gray-300"
                       />
-                      <label
-                        htmlFor="hosting-small"
-                        className="inline-flex items-center justify-between peer-checked:text-[#6941C6] w-full p-5 text-gray-500 bg-white border border-gray-200 rounded-lg cursor-pointer peer-checked:border-[#E5DCFB] peer-checked:border-2 peer-checked:bg-[#F9F5FF] hover:text-[#6941C6] hover:bg-gray-100"
-                      >
-                        <div className="block">
-                          <h1 className="w-full text-lg font-semibold">Criar Tabela Nova</h1>
-                          <p className="w-full">Criação de tabela a partir de colunas</p>
-                        </div>
-                        <svg className="w-5 h-5 ms-3 rtl:rotate-180" aria-hidden="true" fill="none" viewBox="0 0 14 10">
-                          <path
-                            stroke="currentColor"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth="2"
-                            d="M1 5h12m0 0L9 1m4 4L9 9"
-                          />
-                        </svg>
-                      </label>
-                    </li>
-
-                    <li>
-                      <input
-                        type="radio"
-                        id="hosting-big"
-                        name="hosting"
-                        value="hosting-big"
-                        className="hidden peer"
-                        checked={selectedOption === 'hosting-big'}
-                        onChange={(e) => setSelectedOption(e.target.value)}
+                      <span className="text-sm text-gray-700">Criar</span>
+                    </label>
+                    <label className="flex items-center space-x-2 cursor-pointer">
+                      <input 
+                        type="checkbox" 
+                        checked={modulo.read} 
+                        onChange={() => handlePermissaoChange(modulo.modulo, 'read')} 
+                        className="form-checkbox h-4 w-4 text-[#C0090E] rounded focus:ring-[#C0090E] border-gray-300"
                       />
-                      <label
-                        htmlFor="hosting-big"
-                        className="inline-flex items-center justify-between peer-checked:text-[#6941C6] w-full p-5 text-gray-500 bg-white border border-gray-200 rounded-lg cursor-pointer peer-checked:border-[#E5DCFB] peer-checked:border-2 peer-checked:bg-[#F9F5FF] hover:text-[#6941C6] hover:bg-gray-100"
-                      >
-                        <div className="block">
-                          <div className="w-full text-lg font-semibold">Exportar Planilha</div>
-                          <div className="w-full">Criação de tabela a partir de uma planilha</div>
-                        </div>
-                        <svg className="w-5 h-5 ms-3 rtl:rotate-180" aria-hidden="true" fill="none" viewBox="0 0 14 10">
-                          <path
-                            stroke="currentColor"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth="2"
-                            d="M1 5h12m0 0L9 1m4 4L9 9"
-                          />
-                        </svg>
-                      </label>
-                    </li>
-                  </ul>
-                  <div className="flex gap-3">
-                    <ModalButtons text="Cancelar" onClick={() => setIsTableOpen(false)}/>
-                    <ModalButtons text="Confirmar" onClick={handleModalTable}/>
-                  </div>
-                </div>
-              </Modal1>
-              <Modal1 isOpen={isCreateOpen} onClose={() => setIsCreateOpen(false)}>
-                <ModalIcon image={modalIcon}/>
-                <div className="flex flex-col gap-5 mt-4">
-
-                  <div className="flex flex-col gap-1">
-                    <h2 className="text-xl font-bold ">Criar Tabela</h2>
-                    <p>Preencha as informações para criar uma nova tabela.</p>
-                  </div>
-
-                  <div className="flex flex-col gap-2">
-                    <ModalInput label="Nome da tabela" placeholder="Digite o nome da tabela"/>
-                    
-                    {columns.map((column, index) => (
-                      <ModalInput 
-                        key={index}
-                        label={index === 0 ? "Coluna da Tabela" : false}
-                        placeholder="Digite o nome da coluna"
-                        value={column}
-                        onChange={(e) => handleColumnChange(index, e.target.value)}
+                      <span className="text-sm text-gray-700">Ler</span>
+                    </label>
+                    <label className="flex items-center space-x-2 cursor-pointer">
+                      <input 
+                        type="checkbox" 
+                        checked={modulo.update} 
+                        onChange={() => handlePermissaoChange(modulo.modulo, 'update')} 
+                        className="form-checkbox h-4 w-4 text-[#C0090E] rounded focus:ring-[#C0090E] border-gray-300"
                       />
-                    ))}
-                    
-                    <button 
-                      className="text-[#062360] cursor-pointer font-medium w-fit px-2 py-1 rounded hover:bg-[#b0c5ed] transition-colors"
-                      onClick={addColumn}
-                    >
-                      + Adicionar Coluna
-                    </button>
-                </div>
-
-                
-                  <div className="flex gap-3 mt-3">
-                      <ModalButtons text="Cancelar" onClick={() => setIsCreateOpen(false)}/>
-                      <ModalButtons text="Confirmar" />
-                    </div>
-                </div>
-              </Modal1>
-              <Modal1 isOpen={isExportOpen} onClose={() => setIsExportOpen(false)}>
-              <div className="flex flex-col gap-5">
-                  <ModalIcon image={modalIcon}/>
-                  <div className="flex flex-col gap-0.5">
-                    <h1 className="text-[#181D27] font-bold text-[18px]">Criar Tabela</h1>
-                    <p className="text-[#535862] text-[14px]">Selecione o ficheiro da sua planilha</p>
-                  </div>
-                  <ModalInput showLabel={false} placeholder="Selecione o ficheiro"  />
-                  <div className="flex gap-3">
-                    <ModalButtons text="Cancelar" onClick={() => setIsExportOpen(false)}/>
-                    <ModalButtons text="Confirmar" onClick={() => setIsExportOpen(false)}/>
+                      <span className="text-sm text-gray-700">Atualizar</span>
+                    </label>
+                    <label className="flex items-center space-x-2 cursor-pointer">
+                      <input 
+                        type="checkbox" 
+                        checked={modulo.delete} 
+                        onChange={() => handlePermissaoChange(modulo.modulo, 'delete')} 
+                        className="form-checkbox h-4 w-4 text-[#C0090E] rounded focus:ring-[#C0090E] border-gray-300"
+                      />
+                      <span className="text-sm text-gray-700">Deletar</span>
+                    </label>
                   </div>
                 </div>
-              </Modal1>
+              ))}
+            </div>
+          </div>
 
+          <div className="flex gap-3 mt-6 justify-end border-t border-gray-100 pt-4">
+            <ModalButtons 
+              text="Cancelar" 
+              onClick={() => setIsFunOpen(false)} 
+              variant="secondary"
+            />
+            <ModalButtons 
+              text="Cadastrar Funcionário" 
+              onClick={criarFuncionario} 
+              variant="primary"
+            />
+          </div>
+        </div>
+      </Modal1>
 
       <div className="ag-theme-alpine w-full h-[60vh]">
         <AgGridReact
           ref={gridRef}
           theme={themeAlpine}
-          rowHeight={rowHeight}
           rowData={filteredRowData}
           columnDefs={colDefs}
           defaultColDef={defaultColDef}
           pagination={true}
+          paginationPageSize={10}
           rowSelection="multiple"
-           editType="fullRow"
+          editType="fullRow"
         />
       </div>
     </div>

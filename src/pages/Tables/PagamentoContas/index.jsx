@@ -26,17 +26,20 @@ export const PagamentoContas = () => {
   const [dtPagto, setDtPagto] = useState('');
   const [observacao, setObservacao] = useState('');
 
+  var usuario = JSON.parse(localStorage.getItem('usuario'));
+  var perfil = usuario?.perfil;
+
   const colDefs = [
-    { field: "id", headerName: "ID", sortable: true },
-    { field: "instituicao", headerName: "Instituição", flex: 1 },
-    { field: "mes_ref", headerName: "Mês Ref." },
-    { field: "ano_ref", headerName: "Ano Ref." },
-    { field: "dt_prev_entr", headerName: "Previsão Entrega" },
-    { field: "valor_duodecimo", headerName: "Duodécimo" },
-    { field: "valor_desconto", headerName: "Desconto" },
-    { field: "valor_pago", headerName: "Pago" },
-    { field: "dt_pagto", headerName: "Data Pagamento" },
-    { field: "observacao", headerName: "Observação", flex: 1 }
+    { field: "id", headerName: "ID", sortable: true, filter: true, },
+    { field: "instituicao", headerName: "Instituição", flex: 1, sortable: true, filter: true, },
+    { field: "mes_ref", headerName: "Mês Ref.", sortable: true, filter: true, },
+    { field: "ano_ref", headerName: "Ano Ref.", sortable: true, filter: true, },
+    { field: "dt_prev_entr", headerName: "Previsão Entrega", sortable: true, filter: true, },
+    { field: "valor_duodecimo", headerName: "Duodécimo", sortable: true, filter: true, },
+    { field: "valor_desconto", headerName: "Desconto", sortable: true, filter: true, },
+    { field: "valor_pago", headerName: "Pago", sortable: true, filter: true, },
+    { field: "dt_pagto", headerName: "Data Pagamento", sortable: true, filter: true, },
+    { field: "observacao", headerName: "Observação", flex: 1, sortable: true, filter: true, }
   ];
 
   const defaultColDef = {
@@ -48,7 +51,7 @@ export const PagamentoContas = () => {
   const fetchData = async () => {
     try {
       const res = await fetch("http://127.0.0.1:5000/pagamentoContas", {
-        headers: { perfil: "Admin" },
+        headers: { perfil: perfil },
       });
       const data = await res.json();
       setRowData(data);
@@ -80,7 +83,7 @@ export const PagamentoContas = () => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          perfil: "Admin",
+          perfil: perfil,
         },
         body: JSON.stringify({
           id_instit: parseInt(idInstit),
@@ -121,7 +124,7 @@ export const PagamentoContas = () => {
       <div className="flex justify-between mb-4">
         <button
           onClick={() => setIsCreateOpen(true)}
-          className="bg-green-600 text-white px-4 py-2 rounded-md"
+          className="bg-blue-600 text-white px-4 py-2 rounded-md"
         >
           Adicionar Pagamento
         </button>

@@ -1,10 +1,9 @@
-import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useState } from 'react';
 
 export const Authentication = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    sector: '',
     username: '',
     password: ''
   });
@@ -23,13 +22,35 @@ export const Authentication = () => {
     setShowPassword(prev => !prev);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (formData.username && formData.password) {
-        navigate('/administrativo');
-      } else {
-        alert('Por favor, preencha todos os campos');
+  
+    if (!formData.username || !formData.password) {
+      return alert("Preencha todos os campos.");
+    }
+  
+    try {
+      const response = await fetch('http://127.0.0.1:5000/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          NomeUsuario: formData.username,
+          senha: formData.password
+        })
+      });
+  
+      if (!response.ok) {
+        throw new Error('Erro na requisição');
       }
+  
+      const data = await response.json();
+      localStorage.setItem('usuario', JSON.stringify(data));
+      navigate('/administrativo');
+    } catch (error) {
+      alert('Usuário ou senha inválidos.');
+    }
   };
 
   return (

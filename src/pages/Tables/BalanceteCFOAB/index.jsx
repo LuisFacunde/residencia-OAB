@@ -23,14 +23,17 @@ export const BalanceteCFOAB = () => {
   const [eficiencia, setEficiencia] = useState('');
   const [demonstList, setDemonstList] = useState([]);
 
+  var usuario = JSON.parse(localStorage.getItem('usuario'));
+  var perfil = usuario?.perfil;
+
   const colDefs = [
-    { field: "id", headerName: "ID", sortable: true, filter: true },
-    { field: "referencia", headerName: "Referência", sortable: true },
-    { field: "ano", headerName: "Ano", sortable: true },
-    { field: "periodicidade", headerName: "Periodicidade" },
-    { field: "dt_prev_entr", headerName: "Previsão de Entrega" },
-    { field: "dt_entrega", headerName: "Data de Entrega" },
-    { field: "eficiencia", headerName: "Eficiência" },
+    { field: "id", headerName: "ID", sortable: true, filter: true, },
+    { field: "referencia", headerName: "Referência", sortable: true, filter: true, },
+    { field: "ano", headerName: "Ano", sortable: true, filter: true, },
+    { field: "periodicidade", headerName: "Periodicidade", sortable: true, filter: true, },
+    { field: "dt_prev_entr", headerName: "Previsão de Entrega", sortable: true, filter: true, },
+    { field: "dt_entrega", headerName: "Data de Entrega", sortable: true, filter: true, },
+    { field: "eficiencia", headerName: "Eficiência", sortable: true, filter: true, },
   ];
 
   const defaultColDef = {
@@ -43,7 +46,7 @@ export const BalanceteCFOAB = () => {
     try {
       const res = await fetch("http://127.0.0.1:5000/balancete", {
         method: "GET",
-        headers: { perfil: "Admin" },
+        headers: { perfil: perfil },
       });
       const data = await res.json();
       setRowData(data);
@@ -77,7 +80,7 @@ export const BalanceteCFOAB = () => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          perfil: "Admin",
+          perfil: perfil,
         },
         body: JSON.stringify({
           id_demonst: parseInt(idDemonst),
