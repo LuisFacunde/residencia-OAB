@@ -5,7 +5,7 @@ import logo from "../../../assets/logoOab.svg"
 import painel from "../../../assets/painelIcon.svg"
 import tabela from "../../../assets/tabelaIcon.svg"
 
-const tables = ["tabela1", "tabela2", "tabela3"]
+const tables = ["Instituição", "Subseccional", "Demonstrativo" ,"Transparência", "BalanceteCFOAB" ,"Pagamento Contas", "Prestação Subseccional"]
 
 export const Layout = () => {
     return(
