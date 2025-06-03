@@ -100,3 +100,33 @@ def cadastrar_usuario_com_permissoes(nome, email, senha, nome_perfil, permissoes
     conn.close()
     return {"sucesso": "Usuário cadastrado com sucesso."}
 
+def listar_todos_usuarios():
+    conn = conectar()
+    cursor = conn.cursor()
+    cursor.execute("""
+        SELECT U.Id, U.Nome, U.NomeUsuario, U.Email, U.Setor, U.Cargo, P.Nome as Perfil, U.Status
+        FROM Usuarios U
+        INNER JOIN Perfis P ON U.Id_Perfil = P.Id
+    """)
+    colunas = [desc[0] for desc in cursor.description]
+    dados = cursor.fetchall()
+    conn.close()
+
+    return [dict(zip(colunas, linha)) for linha in dados]
+
+def obter_usuario_por_id(id):
+    conn = conectar()
+    cursor = conn.cursor()
+    cursor.execute("""
+        SELECT U.Id, U.Nome, U.NomeUsuario, U.Email, U.Setor, U.Cargo, P.Nome as Perfil, U.Status
+        FROM Usuarios U
+        INNER JOIN Perfis P ON U.Id_Perfil = P.Id
+        WHERE U.Email = ?
+    """, (id,))
+    row = cursor.fetchone()
+    colunas = [desc[0] for desc in cursor.description]
+    conn.close()
+
+    if row:
+        return dict(zip(colunas, row))
+    return None
