@@ -5,7 +5,11 @@ from flask import Flask, request, jsonify, make_response
 from flask_cors import CORS
 from models import usuario_model, permissoes_model, instituicao_model, subseccional_model, demonstrativo_model
 from models import transparencia_model, balancete_model, pagamentoCotas_model, prestacaoContasSubsecciona_model
-from models import baseOrcamentaria_model, tabela_dinamica_model, importar_model, exportar_model
+from models import baseOrcamentaria_model, tabela_dinamica_model, importar_model, exportar_model, perfil_model
+
+import sqlite3
+def conectar():
+    return sqlite3.connect('seu_banco_de_dados.db')
 
 app = Flask(__name__)
 CORS(app)
@@ -646,6 +650,57 @@ def gerar_relatorio_pdf(tabela):
         return response
     except Exception as e:
         return jsonify({"erro": str(e)}), 500
+
+#Perfil    
+@app.route('/perfis', methods=['POST'])
+def criar_perfil():
+    perfil_admin = request.headers.get('perfil')
+
+    if not perfil_model.verificar_permissao(perfil_admin, 'Perfis', 'C'):
+        return jsonify({"erro": "Sem permissão para criar perfil"}), 403
+
+    data = request.json
+    nome_perfil = data.get("nome")
+    permissoes = data.get("permissoes", [])
+
+    if not nome_perfil:
+        return jsonify({"erro": "Nome do perfil é obrigatório"}), 400
+
+    conn = conectar()
+    cursor = conn.cursor()
+
+    try:
+        cursor.execute("SELECT Id FROM Perfis WHERE Nome = ?", (nome_perfil,))
+        if cursor.fetchone():
+            return jsonify({"erro": "Perfil já existente"}), 400
+
+        cursor.execute("INSERT INTO Perfis (Nome) VALUES (?)", (nome_perfil,))
+        perfil_id = cursor.lastrowid
+
+        for p in permissoes:
+            modulo = p.get("modulo")
+            if not modulo:
+                continue  
+
+            p_create = int(p.get("create", 0))
+            p_read   = int(p.get("read", 0))
+            p_update = int(p.get("update", 0))
+            p_delete = int(p.get("delete", 0))
+
+            cursor.execute("""
+                INSERT INTO Permissoes (Id_Perfil, Modulo, P_Create, P_Read, P_Update, P_Delete)
+                VALUES (?, ?, ?, ?, ?, ?)
+            """, (perfil_id, modulo, p_create, p_read, p_update, p_delete))
+
+        conn.commit()
+        return jsonify({"mensagem": "Perfil criado com sucesso."}), 201
+
+    except Exception as e:
+        conn.rollback()
+        return jsonify({"erro": f"Erro ao criar perfil: {str(e)}"}), 500
+    finally:
+        conn.close()
+
 
 if __name__ == '__main__':
     app.run(debug=True)
