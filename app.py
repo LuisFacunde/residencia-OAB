@@ -1,8 +1,11 @@
-from flask import Flask, request, jsonify
+from io import BytesIO
+from reportlab.lib.pagesizes import letter
+from reportlab.pdfgen import canvas
+from flask import Flask, request, jsonify, make_response
 from flask_cors import CORS
 from models import usuario_model, permissoes_model, instituicao_model, subseccional_model, demonstrativo_model
 from models import transparencia_model, balancete_model, pagamentoCotas_model, prestacaoContasSubsecciona_model
-from models import baseOrcamentaria_model, tabela_dinamica_model
+from models import baseOrcamentaria_model, tabela_dinamica_model, importar_model, exportar_model
 
 app = Flask(__name__)
 CORS(app)
@@ -35,10 +38,10 @@ def criar_usuario():
     nome = data.get('nome')
     email = data.get('email')
     senha = data.get('senha')
-    nome_perfil = data.get('perfil')
-    setor = data.get('setor')
+    nome_perfil = data.get('perfil')  
+    setor = data.get('setor')     
     cargo = data.get('cargo') 
-    permissoes = data.get('permissoes', [])
+    permissoes = data.get('permissoes', [])  
 
     if not all([nome, email, senha, nome_perfil]):
         return jsonify({'erro': 'Campos obrigatórios ausentes'}), 400
@@ -57,6 +60,28 @@ def criar_usuario():
         return jsonify(resultado), 400
 
     return jsonify(resultado), 201
+
+@app.route('/usuarios', methods=['GET'])
+def listar_usuarios():
+    perfil = request.headers.get('perfil')
+    if not permissoes_model.verificar_permissao(perfil, 'Usuarios', 'R'):
+        return jsonify({'erro': 'Sem permissão para visualizar usuários'}), 403
+
+    usuarios = usuario_model.listar_todos_usuarios()
+    return jsonify(usuarios), 200
+
+@app.route('/usuarios/<id>', methods=['GET'])
+def obter_usuario(id):
+    perfil = request.headers.get('perfil')
+    if not permissoes_model.verificar_permissao(perfil, 'Usuarios', 'R'):
+        return jsonify({'erro': 'Sem permissão para visualizar usuário'}), 403
+
+    usuario = usuario_model.obter_usuario_por_id(id)
+    if usuario:
+        return jsonify(usuario), 200
+    else:
+        return jsonify({'erro': 'Usuário não encontrado'}), 404
+
 
 @app.route('/usuarios/<email>', methods=['PUT'])
 def editar_usuario(email):
@@ -84,13 +109,13 @@ def excluir_usuario(email):
 
 #Instituição
 @app.route('/instituicao', methods=['GET'])
-def listar_instituicoes():
+def listar_instituicao():
     perfil = request.headers.get('perfil')
 
     if not permissoes_model.verificar_permissao(perfil, 'Instituicao', 'R'):
         return jsonify({"erro": "Sem permissão para listar instituições"}), 403
 
-    dados = instituicao_model.listar_instituicoes()
+    dados = instituicao_model.listar_instituicao()
     return jsonify(dados)
 
 @app.route('/instituicao', methods=['POST'])
@@ -118,7 +143,7 @@ def listar_subseccionais():
     if not permissoes_model.verificar_permissao(perfil, 'Subseccional', 'R'):
         return jsonify({"erro": "Sem permissão para leitura"}), 403
 
-    dados = subseccional_model.listar_subseccionais()
+    dados = subseccional_model.listar_subseccional()
     return jsonify(dados)
 
 @app.route('/subseccional', methods=['POST'])
@@ -541,6 +566,86 @@ def criar_tabela():
         return jsonify(resultado), 400
 
     return jsonify({"mensagem": "Tabela criada com sucesso"}), 201
+
+#Importar Arquivo
+@app.route('/importar/<tabela>', methods=['POST'])
+def importar_dados(tabela):
+    perfil = request.headers.get('perfil')
+
+    if not permissoes_model.verificar_permissao(perfil, tabela, 'C'):
+        return jsonify({"erro": "Sem permissão para importar dados"}), 403
+
+    if 'arquivo' not in request.files:
+        return jsonify({"erro": "Arquivo não enviado"}), 400
+
+    arquivo = request.files['arquivo']
+
+    def importar_arquivo_para_tabela(tabela, arquivo):
+        try:
+            return importar_model.importar_arquivo_para_tabela(tabela, arquivo)
+        except Exception as e:
+            return {'erro': str(e)}
+
+    resultado = importar_arquivo_para_tabela(tabela, arquivo)
+    if 'erro' in resultado:
+        return jsonify(resultado), 400
+
+    return jsonify({"mensagem": "Importação realizada com sucesso"}), 200
+
+#Exportar Tabela
+@app.route('/relatorio/<tabela>', methods=['GET'])
+def gerar_relatorio_pdf(tabela):
+    perfil = request.headers.get('perfil')
+
+    if not permissoes_model.verificar_permissao(perfil, tabela, 'R'):
+        return jsonify({"erro": "Sem permissão para gerar relatórios"}), 403
+
+    def buscar_dados_tabela(tabela):
+        try:
+            dados, colunas = exportar_model.buscar_dados_tabela(tabela)
+            return dados, colunas
+        except Exception as e:
+            raise Exception(f"Erro ao buscar dados da tabela: {str(e)}")
+
+    def gerar_pdf_relatorio(tabela, colunas, dados):
+        buffer = BytesIO()
+        p = canvas.Canvas(buffer, pagesize=letter)
+        width, height = letter
+
+        y = height - 40
+        p.setFont("Helvetica-Bold", 14)
+        p.drawString(40, y, f"Relatório: {tabela}")
+        y -= 30
+
+        p.setFont("Helvetica-Bold", 10)
+        for idx, col in enumerate(colunas):
+            p.drawString(40 + idx * 100, y, str(col))
+        y -= 20
+
+        p.setFont("Helvetica", 10)
+        for row in dados:
+            for idx, value in enumerate(row):
+                p.drawString(40 + idx * 100, y, str(value))
+            y -= 15
+            if y < 40:
+                p.showPage()
+                y = height - 40
+
+        p.save()
+        pdf = buffer.getvalue()
+        buffer.close()
+        return pdf
+
+    try:
+        dados, colunas = buscar_dados_tabela(tabela)
+        pdf_bytes = gerar_pdf_relatorio(tabela, colunas, dados)
+
+        response = make_response(pdf_bytes)
+        response.headers['Content-Type'] = 'application/pdf'
+        response.headers['Content-Disposition'] = f'attachment; filename={tabela}_relatorio.pdf'
+        return response
+    except Exception as e:
+        return jsonify({"erro": str(e)}), 500
 
 if __name__ == '__main__':
     app.run(debug=True)
