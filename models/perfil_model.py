@@ -1,6 +1,6 @@
 from db_conexao import conectar
 
-def criar_perfil(nome, permissoes):
+def criar_perfil_db(nome, permissoes):
     conn = conectar()
     cursor = conn.cursor()
 
