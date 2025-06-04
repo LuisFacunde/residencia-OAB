@@ -4,44 +4,79 @@ def criar_perfil_db(nome, permissoes):
     conn = conectar()
     cursor = conn.cursor()
 
-    cursor.execute("SELECT Id FROM Perfis WHERE Nome = ?", (nome,))
-    if cursor.fetchone():
-        conn.close()
-        return {"erro": "Perfil já existe."}
+    try:
+        # Verifica se perfil existe
+        cursor.execute("SELECT Id FROM Perfis WHERE Nome = ?", (nome,))
+        if cursor.fetchone():
+            return {"erro": "Perfil já existe."}
 
-    cursor.execute("INSERT INTO Perfis (Nome) VALUES (?)", (nome,))
-    perfil_id = cursor.lastrowid
-
-    for p in permissoes:
-        modulo = p.get("modulo")
-        p_create = int(p.get("create", 0))
-        p_read   = int(p.get("read", 0))
-        p_update = int(p.get("update", 0))
-        p_delete = int(p.get("delete", 0))
-
+        # Insere o perfil e obtém o ID (SQL Server)
         cursor.execute("""
-            INSERT INTO Permissoes (Id_Perfil, Modulo, P_Create, P_Read, P_Update, P_Delete)
-            VALUES (?, ?, ?, ?, ?, ?)
-        """, (perfil_id, modulo, p_create, p_read, p_update, p_delete))
+            INSERT INTO Perfis (Nome) 
+            OUTPUT INSERTED.Id
+            VALUES (?)
+        """, (nome,))
+        perfil_id = cursor.fetchone()[0]
 
-    conn.commit()
-    conn.close()
-    return {"mensagem": "Perfil criado com sucesso."}
+        # Insere as permissões
+        for p in permissoes:
+            cursor.execute("""
+                INSERT INTO Permissoes 
+                (Id_Perfil, Modulo, P_Create, P_Read, P_Update, P_Delete)
+                VALUES (?, ?, ?, ?, ?, ?)
+            """, (
+                perfil_id,
+                p.get("modulo"),
+                int(p.get("create", 0)),
+                int(p.get("read", 0)),
+                int(p.get("update", 0)),
+                int(p.get("delete", 0))
+            ))
+
+        conn.commit()
+        return {"mensagem": "Perfil criado com sucesso.", "id": perfil_id}
+    except Exception as e:
+        conn.rollback()
+        print(f"Erro ao criar perfil: {str(e)}")
+        return {"erro": f"Erro ao criar perfil: {str(e)}"}
+    finally:
+        conn.close()
 
 def listar_perfis():
     conn = conectar()
     cursor = conn.cursor()
 
-    cursor.execute("SELECT Id, Nome FROM Perfis")
-    perfis = cursor.fetchall()
+    try:
+        cursor.execute("SELECT Id, Nome FROM Perfis")
+        perfis = cursor.fetchall()
 
-    perfil_list = []
-    for perfil in perfis:
-        perfil_id, nome = perfil
-        cursor.execute("SELECT Modulo, P_Create, P_Read, P_Update, P_Delete FROM Permissoes WHERE Id_Perfil = ?", (perfil_id,))
-        permissoes = cursor.fetchall()
-        permissoes_list = [{"modulo": p[0], "create": p[1], "read": p[2], "update": p[3], "delete": p[4]} for p in permissoes]
-        perfil_list.append({"id": perfil_id, "nome": nome, "permissoes": permissoes_list})
+        perfil_list = []
+        for perfil in perfis:
+            perfil_id, nome = perfil
+            cursor.execute("""
+                SELECT Modulo, P_Create, P_Read, P_Update, P_Delete 
+                FROM Permissoes 
+                WHERE Id_Perfil = ?
+            """, (perfil_id,))
+            permissoes = cursor.fetchall()
+            
+            permissoes_list = [{
+                "modulo": p[0], 
+                "create": bool(p[1]), 
+                "read": bool(p[2]), 
+                "update": bool(p[3]), 
+                "delete": bool(p[4])
+            } for p in permissoes]
+            
+            perfil_list.append({
+                "id": perfil_id, 
+                "nome": nome, 
+                "permissoes": permissoes_list
+            })
 
-    conn.close()
-    return perfil_list
+        return perfil_list
+    except Exception as e:
+        print(f"Erro ao listar perfis: {str(e)}")
+        raise
+    finally:
+        conn.close()

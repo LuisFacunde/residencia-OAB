@@ -1,4 +1,5 @@
 from io import BytesIO
+import traceback
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 from flask import Flask, request, jsonify, make_response
@@ -119,7 +120,7 @@ def listar_instituicao():
     if not permissoes_model.verificar_permissao(perfil, 'Instituicao', 'R'):
         return jsonify({"erro": "Sem permissão para listar instituições"}), 403
 
-    dados = instituicao_model.listar_instituicao()
+    dados = instituicao_model.listar_instituicoes()
     return jsonify(dados)
 
 @app.route('/instituicao', methods=['POST'])
@@ -147,7 +148,7 @@ def listar_subseccionais():
     if not permissoes_model.verificar_permissao(perfil, 'Subseccional', 'R'):
         return jsonify({"erro": "Sem permissão para leitura"}), 403
 
-    dados = subseccional_model.listar_subseccional()
+    dados = subseccional_model.listar_subseccionais()
     return jsonify(dados)
 
 @app.route('/subseccional', methods=['POST'])
@@ -651,7 +652,8 @@ def gerar_relatorio_pdf(tabela):
     except Exception as e:
         return jsonify({"erro": str(e)}), 500
 
-#Perfil    
+# Perfil
+@app.route('/perfis', methods=['POST'])
 def criar_perfil():
     perfil_admin = request.headers.get('perfil')
 
@@ -666,9 +668,7 @@ def criar_perfil():
         return jsonify({"erro": "Nome do perfil é obrigatório"}), 400
 
     try:
-        def criar_perfil_db(nome, permissoes):
-            return perfil_model.criar_perfil(nome, permissoes)
-        resultado = criar_perfil_db(nome, permissoes)
+        resultado = perfil_model.criar_perfil_db(nome, permissoes)  # Corrigido aqui
         status = 201 if "mensagem" in resultado else 400
         return jsonify(resultado), status
     except Exception as e:
@@ -677,27 +677,17 @@ def criar_perfil():
 
 @app.route('/perfis', methods=['GET'])
 def listar_perfis():
-    perfil = request.headers.get('perfil')
-    
-    if not permissoes_model.verificar_permissao(perfil, 'Perfis', 'R'):
-        return jsonify({"erro": "Sem permissão para visualizar perfis"}), 403
+    try:
+        perfil = request.headers.get('perfil')
+        
+        if not permissoes_model.verificar_permissao(perfil, 'Perfis', 'R'):
+            return jsonify({"erro": "Sem permissão para visualizar perfis"}), 403
 
-    conn = conectar()
-    cursor = conn.cursor()
-    
-    cursor.execute("SELECT Id, Nome FROM Perfis")
-    perfis = cursor.fetchall()
-
-    resultado = []
-    for p in perfis:
-        perfil_id, nome = p
-        resultado.append({
-            "id": perfil_id,
-            "nome": nome
-        })
-
-    conn.close()
-    return jsonify(resultado)
+        perfis = perfil_model.listar_perfis()
+        return jsonify(perfis)
+    except Exception as e:
+        print(f"Erro na rota /perfis: {str(e)}")
+        return jsonify({"erro": "Erro interno ao listar perfis"}), 500
 
 @app.route('/perfis/<int:id>', methods=['GET'])
 def buscar_perfil(id):

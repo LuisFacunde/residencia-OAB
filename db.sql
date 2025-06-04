@@ -108,6 +108,8 @@ INSERT INTO Perfis (Nome) VALUES
 ('Escrita'),
 ('Auditoria');
 
+SELECT * FROM perfis;
+
 CREATE TABLE Usuarios (
     Id INT IDENTITY(1,1) PRIMARY KEY,
     Nome VARCHAR(100) NOT NULL,
