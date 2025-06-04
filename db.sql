@@ -144,7 +144,8 @@ VALUES
 (1, 'PrestacaoContasSubseccional', 1, 1, 1, 1),
 (1, 'BaseOrcamentaria', 1, 1, 1, 1),
 (1, 'Usuarios', 1, 1, 1, 1),
-(1, 'CriarTabela', 1, 0, 0, 0);
+(1, 'CriarTabela', 1, 1, 1, 1),
+(1, 'Perfis', 1, 1, 1, 1);
 
 INSERT INTO Permissoes (Id_Perfil, Modulo, P_Create, P_Read, P_Update, P_Delete)
 VALUES 
@@ -156,7 +157,9 @@ VALUES
 (2, 'PagamentoCotas', 0, 1, 0, 0),
 (2, 'PrestacaoContasSubseccional', 0, 1, 0, 0),
 (2, 'BaseOrcamentaria', 0, 1, 0, 0),
-(2, 'Usuarios', 0, 1, 0, 0);
+(2, 'Usuarios', 0, 1, 0, 0),
+(2, 'CriarTabela', 0, 1, 0, 0),
+(2, 'Perfis', 0, 1, 0, 0);
 
 INSERT INTO Permissoes (Id_Perfil, Modulo, P_Create, P_Read, P_Update, P_Delete)
 VALUES 
@@ -168,7 +171,9 @@ VALUES
 (3, 'PagamentoCotas', 1, 1, 1, 0),
 (3, 'PrestacaoContasSubseccional', 1, 1, 1, 0),
 (3, 'BaseOrcamentaria', 1, 1, 1, 0),
-(3, 'Usuarios', 1, 1, 1, 0);
+(3, 'Usuarios', 1, 1, 1, 0),
+(3, 'CriarTabela', 1, 1, 1, 0),
+(3, 'Perfis', 0, 1, 0, 0);
 
 INSERT INTO Permissoes (Id_Perfil, Modulo, P_Create, P_Read, P_Update, P_Delete)
 VALUES 
@@ -180,4 +185,7 @@ VALUES
 (4, 'PagamentoCotas', 0, 1, 0, 0),
 (4, 'PrestacaoContasSubseccional', 0, 1, 0, 0),
 (4, 'BaseOrcamentaria', 0, 1, 0, 0),
-(4, 'Usuarios', 0, 1, 0, 0);
+(4, 'Usuarios', 0, 1, 0, 0),
+(4, 'CriarTabela', 0, 1, 0, 0),
+(4, 'Perfis', 0, 1, 0, 0);
+
