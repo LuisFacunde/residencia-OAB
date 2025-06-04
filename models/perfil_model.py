@@ -27,3 +27,21 @@ def criar_perfil(nome, permissoes):
     conn.commit()
     conn.close()
     return {"mensagem": "Perfil criado com sucesso."}
+
+def listar_perfis():
+    conn = conectar()
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT Id, Nome FROM Perfis")
+    perfis = cursor.fetchall()
+
+    perfil_list = []
+    for perfil in perfis:
+        perfil_id, nome = perfil
+        cursor.execute("SELECT Modulo, P_Create, P_Read, P_Update, P_Delete FROM Permissoes WHERE Id_Perfil = ?", (perfil_id,))
+        permissoes = cursor.fetchall()
+        permissoes_list = [{"modulo": p[0], "create": p[1], "read": p[2], "update": p[3], "delete": p[4]} for p in permissoes]
+        perfil_list.append({"id": perfil_id, "nome": nome, "permissoes": permissoes_list})
+
+    conn.close()
+    return perfil_list
