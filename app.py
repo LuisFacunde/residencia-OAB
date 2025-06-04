@@ -656,7 +656,7 @@ def gerar_relatorio_pdf(tabela):
 def criar_perfil():
     perfil_admin = request.headers.get('perfil')
 
-    if not perfil_model.verificar_permissao(perfil_admin, 'Perfis', 'C'):
+    if not permissoes_model.verificar_permissao(perfil_admin, 'Perfis', 'C'):
         return jsonify({"erro": "Sem permissão para criar perfil"}), 403
 
     data = request.json
@@ -701,6 +701,71 @@ def criar_perfil():
     finally:
         conn.close()
 
+@app.route('/perfis', methods=['GET'])
+def listar_perfis():
+    perfil = request.headers.get('perfil')
+    
+    if not permissoes_model.verificar_permissao(perfil, 'Perfis', 'R'):
+        return jsonify({"erro": "Sem permissão para visualizar perfis"}), 403
+
+    conn = conectar()
+    cursor = conn.cursor()
+    
+    cursor.execute("SELECT Id, Nome FROM Perfis")
+    perfis = cursor.fetchall()
+
+    resultado = []
+    for p in perfis:
+        perfil_id, nome = p
+        resultado.append({
+            "id": perfil_id,
+            "nome": nome
+        })
+
+    conn.close()
+    return jsonify(resultado)
+
+@app.route('/perfis/<int:id>', methods=['GET'])
+def buscar_perfil(id):
+    perfil = request.headers.get('perfil')
+
+    if not permissoes_model.verificar_permissao(perfil, 'Perfis', 'R'):
+        return jsonify({"erro": "Sem permissão para visualizar perfis"}), 403
+
+    conn = conectar()
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT Nome FROM Perfis WHERE Id = ?", (id,))
+    row = cursor.fetchone()
+
+    if not row:
+        conn.close()
+        return jsonify({"erro": "Perfil não encontrado"}), 404
+
+    nome_perfil = row[0]
+
+    cursor.execute("""
+        SELECT Modulo, P_Create, P_Read, P_Update, P_Delete
+        FROM Permissoes WHERE Id_Perfil = ?
+    """, (id,))
+    permissoes = cursor.fetchall()
+
+    lista_permissoes = []
+    for p in permissoes:
+        lista_permissoes.append({
+            "modulo": p[0],
+            "create": bool(p[1]),
+            "read": bool(p[2]),
+            "update": bool(p[3]),
+            "delete": bool(p[4])
+        })
+
+    conn.close()
+    return jsonify({
+        "id": id,
+        "nome": nome_perfil,
+        "permissoes": lista_permissoes
+    })
 
 if __name__ == '__main__':
     app.run(debug=True)
