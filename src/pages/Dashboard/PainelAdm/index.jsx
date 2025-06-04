@@ -6,18 +6,20 @@ import { themeAlpine } from 'ag-grid-community';
 import { Modal1 } from "../../../components/Modal1";
 import { ModalIcon } from "../../../components/ModalIcon";
 import { ModalButtons } from "../../../components/ModalButtons";
-import modalIcon from "../../../assets/tabelaIcon.svg"
-import funcionarioIcon from "../../../assets/funcionarioIcon.svg"
+import funcionarioIcon from "../../../assets/funcionarioIcon.svg";
+import perfilIcon from "../../../assets/profile.svg";
 import { ModalInput2 } from "../../../components/ModalInput2";
+import { ModalSelect } from "../../../components/ModalSelect";
 ModuleRegistry.registerModules([AllCommunityModule]);
-
-
 
 export const PainelAdm = () => {
   const gridRef = useRef();
   const [isFunOpen, setIsFunOpen] = useState(false);
+  const [isPerfilOpen, setIsPerfilOpen] = useState(false);
   const [quickFilterText, setQuickFilterText] = useState('');
   const [filteredRowData, setFilteredRowData] = useState([]);
+  const [rowData, setRowData] = useState([]);
+  const [perfisDisponiveis, setPerfisDisponiveis] = useState([]); // Estado para armazenar os perfis
 
   // Estado para o formulário de funcionário
   const [funcionarioData, setFuncionarioData] = useState({
@@ -27,6 +29,11 @@ export const PainelAdm = () => {
     perfil: '',
     setor: '',
     cargo: ''
+  });
+
+  // Estado para o formulário de perfil
+  const [perfilData, setPerfilData] = useState({
+    nome: '',
   });
 
   // Estado para módulos de permissão
@@ -39,24 +46,16 @@ export const PainelAdm = () => {
     { modulo: 'PagamentoCotas', create: false, read: false, update: false, delete: false },
     { modulo: 'PrestacaoContasSubseccional', create: false, read: false, update: false, delete: false },
     { modulo: 'BaseOrcamentaria', create: false, read: false, update: false, delete: false },
-    { modulo: 'Usuarios', create: false, read: false, update: false, delete: false }
-  ]);
-
-  // Dados mockados para a tabela
-  const [rowData] = useState([
-    { func: "Caio.Carvalho", Setor: "Advocacia", info1: "info extra?", info2: "info extra?", info3: "info extra?" },
-    { func: "Arthur.Tavares", Setor: "Advocacia", info1: "info extra?", info2: "info extra?", info3: "info extra?" },
-    { func: "Jamila.Lobo", Setor: "Advocacia", info1: "info extra?", info2: "info extra?", info3: "info extra?" },
-    { func: "Luiz.Facundes", Setor: "Advocacia", info1: "info extra?", info2: "info extra?", info3: "info extra?" }
+    { modulo: 'Usuarios', create: false, read: false, update: false, delete: false },
+    { modulo: 'Perfis', create: false, read: false, update: false, delete: false }
   ]);
 
   const [colDefs] = useState([
     {
-      field: "func",
+      field: "NomeUsuario",
       headerName: "Funcionário",
       sortable: true,
       filter: true,
-      editable: true,
       checkboxSelection: true,
     },
     {
@@ -64,15 +63,34 @@ export const PainelAdm = () => {
       headerName: "Setor",
       sortable: true,
       filter: true,
-      editable: true,
-      cellEditor: "agSelectCellEditor",
-      cellEditorParams: {
-        values: ["Advocacia", "Financeiro", "RH", "TI", "Logística"],
-      },
     },
-    { field: "info1", headerName: "Info Extra?", sortable: true, filter: true, editable: true },
-    { field: "info2", headerName: "Info Extra?", sortable: true, filter: true, editable: true },
-    { field: "info3", headerName: "Info Extra?", sortable: true, filter: true, editable: true },
+    { 
+      field: "Perfil", 
+      headerName: "Perfil", 
+      sortable: true, 
+      filter: true 
+    },
+    { 
+      field: "Email", 
+      headerName: "Email", 
+      sortable: true, 
+      filter: true 
+    },
+    { 
+      field: "Cargo", 
+      headerName: "Cargo", 
+      sortable: true, 
+      filter: true 
+    },
+    { 
+      field: "Status", 
+      headerName: "Status", 
+      sortable: true, 
+      filter: true,
+      cellRenderer: (params) => {
+        return params.value === 'A' ? 'Ativo' : 'Inativo';
+      }
+    }
   ]);
 
   const defaultColDef = {
@@ -81,33 +99,72 @@ export const PainelAdm = () => {
     resizable: true,
   };
 
-  // Filtro de busca
-  useEffect(() => {
-    setFilteredRowData(rowData);
-  }, [rowData]);
+  // Função para carregar os usuários
+  const carregarUsuarios = async () => {
+    try {
+      const usuario = JSON.parse(localStorage.getItem('usuario'));
+      const perfil = usuario?.perfil;
 
-  const onFilterTextBoxChanged = useCallback((e) => {
-    const searchValue = e.target.value.toLowerCase();
-    setQuickFilterText(searchValue);
-    
-    if (!searchValue) {
-      setFilteredRowData(rowData);
-      return;
+      const response = await fetch('http://127.0.0.1:5000/usuarios', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'perfil': perfil
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error('Erro ao carregar usuários');
+      }
+
+      const data = await response.json();
+      setRowData(data);
+      setFilteredRowData(data);
+    } catch (error) {
+      console.error('Erro ao carregar usuários:', error);
+      alert(error.message);
     }
+  };
 
-    const filteredData = rowData.filter(row => {
-      return Object.values(row).some(value => 
-        String(value).toLowerCase().includes(searchValue)
-      );
-    });
+  // Função para carregar os perfis disponíveis
+  const carregarPerfis = async () => {
+    try {
+      const usuario = JSON.parse(localStorage.getItem('usuario'));
+      const perfil = usuario?.perfil;
 
-    setFilteredRowData(filteredData);
-  }, [rowData]);
+      const response = await fetch('http://127.0.0.1:5000/perfis', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'perfil': perfil
+        }
+      });
 
-  // Manipulador de mudança para os campos do formulário
+      if (!response.ok) {
+        throw new Error('Erro ao carregar perfis');
+      }
+
+      const data = await response.json();
+      setPerfisDisponiveis(data);
+    } catch (error) {
+      console.error('Erro ao carregar perfis:', error);
+      alert(error.message);
+    }
+  };
+
+  // Manipulador de mudança para os campos do formulário de usuário
   const handleFuncionarioChange = (e) => {
     const { name, value } = e.target;
     setFuncionarioData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  // Manipulador de mudança para os campos do formulário de perfil
+  const handlePerfilChange = (e) => {
+    const { name, value } = e.target;
+    setPerfilData(prev => ({
       ...prev,
       [name]: value
     }));
@@ -130,22 +187,17 @@ export const PainelAdm = () => {
         throw new Error('Preencha todos os campos obrigatórios');
       }
 
-      // Preparar as permissões no formato esperado pelo backend
-      const permissoesFormatadas = permissoes.map(modulo => ({
-        modulo: modulo.modulo,
-        create: modulo.create ? 1 : 0,
-        read: modulo.read ? 1 : 0,
-        update: modulo.update ? 1 : 0,
-        delete: modulo.delete ? 1 : 0
-      }));
-
       const payload = {
-        ...funcionarioData,
-        permissoes: permissoesFormatadas
+        nome: funcionarioData.nome,
+        email: funcionarioData.email,
+        senha: funcionarioData.senha,
+        perfil: funcionarioData.perfil,
+        setor: funcionarioData.setor,
+        cargo: funcionarioData.cargo
       };
-      console.log(payload);
-      var usuario = JSON.parse(localStorage.getItem('usuario'));
-      var perfil = usuario?.perfil;
+
+      const usuario = JSON.parse(localStorage.getItem('usuario'));
+      const perfil = usuario?.perfil;
 
       const response = await fetch('http://127.0.0.1:5000/usuarios', {
         method: 'POST',
@@ -165,7 +217,7 @@ export const PainelAdm = () => {
       alert('Funcionário criado com sucesso!');
       setIsFunOpen(false);
       
-      // Resetar o formulário
+      // Resetar o formulário e recarregar os usuários
       setFuncionarioData({
         nome: '',
         email: '',
@@ -174,7 +226,58 @@ export const PainelAdm = () => {
         setor: '',
         cargo: ''
       });
+
+      await carregarUsuarios();
+    } catch (error) {
+      console.error('Erro:', error);
+      alert(error.message || 'Erro ao criar funcionário');
+    }
+  };
+
+  // Função para criar um novo perfil
+  const criarPerfil = async () => {
+    try {
+      if (!perfilData.nome) {
+        throw new Error('Nome do perfil é obrigatório');
+      }
+
+      // Preparar as permissões no formato esperado pelo backend
+      const permissoesFormatadas = permissoes.map(modulo => ({
+        modulo: modulo.modulo,
+        create: modulo.create ? 1 : 0,
+        read: modulo.read ? 1 : 0,
+        update: modulo.update ? 1 : 0,
+        delete: modulo.delete ? 1 : 0
+      }));
+
+      const payload = {
+        nome: perfilData.nome,
+        permissoes: permissoesFormatadas
+      };
+
+      const usuario = JSON.parse(localStorage.getItem('usuario'));
+      const perfilAdmin = usuario?.perfil;
+
+      const response = await fetch('http://127.0.0.1:5000/perfis', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'perfil': perfilAdmin
+        },
+        body: JSON.stringify(payload)
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.erro || 'Erro ao criar perfil');
+      }
+
+      alert('Perfil criado com sucesso!');
+      setIsPerfilOpen(false);
       
+      // Resetar o formulário e recarregar perfis
+      setPerfilData({ nome: '' });
       setPermissoes(permissoes.map(p => ({
         ...p,
         create: false,
@@ -182,11 +285,35 @@ export const PainelAdm = () => {
         update: false,
         delete: false
       })));
+
+      await carregarPerfis();
     } catch (error) {
       console.error('Erro:', error);
-      alert(error.message || 'Erro ao criar funcionário');
+      alert(error.message || 'Erro ao criar perfil');
     }
   };
+
+  // Carrega os usuários e perfis quando o componente é montado
+  useEffect(() => {
+    carregarUsuarios();
+    carregarPerfis();
+  }, []);
+
+  // Atualiza os dados filtrados quando rowData ou quickFilterText mudam
+  useEffect(() => {
+    if (!quickFilterText) {
+      setFilteredRowData(rowData);
+      return;
+    }
+
+    const filteredData = rowData.filter(row => {
+      return Object.values(row).some(value => 
+        String(value).toLowerCase().includes(quickFilterText.toLowerCase())
+      );
+    });
+
+    setFilteredRowData(filteredData);
+  }, [quickFilterText, rowData]);
 
   return (
     <div className="p-4">
@@ -200,6 +327,14 @@ export const PainelAdm = () => {
               Adicionar Funcionario
             </button>
           </li>
+          <li>
+            <button 
+              onClick={() => setIsPerfilOpen(true)} 
+              className="bg-[#062360] text-white px-4 py-2 cursor-pointer rounded-[10px] mb-4"
+            >
+              Criar Perfil
+            </button>
+          </li>
         </ul>
         <div className="w-[400px]">
           <div className="relative">
@@ -208,7 +343,7 @@ export const PainelAdm = () => {
               placeholder="Buscar em todos os dados..."
               className="p-2 border border-gray-300 rounded-md w-full pl-10"
               value={quickFilterText}
-              onChange={onFilterTextBoxChanged}
+              onChange={(e) => setQuickFilterText(e.target.value)}
             />
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
               <svg className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -217,10 +352,7 @@ export const PainelAdm = () => {
             </div>
             {quickFilterText && (
               <button
-                onClick={() => {
-                  setQuickFilterText('');
-                  setFilteredRowData(rowData);
-                }}
+                onClick={() => setQuickFilterText('')}
                 className="absolute inset-y-0 right-0 pr-3 flex items-center"
               >
                 <svg className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -264,12 +396,16 @@ export const PainelAdm = () => {
               value={funcionarioData.senha}
               onChange={handleFuncionarioChange}
             />
-            <ModalInput2 
-              label="Perfil*" 
-              placeholder="Perfil do usuário"
+            <ModalSelect
+              label="Perfil*"
               name="perfil"
               value={funcionarioData.perfil}
               onChange={handleFuncionarioChange}
+              options={perfisDisponiveis.map(perfil => ({
+                value: perfil.nome,
+                label: perfil.nome
+              }))}
+              placeholder="Selecione um perfil"
             />
             <ModalInput2 
               label="Setor" 
@@ -287,8 +423,41 @@ export const PainelAdm = () => {
             />
           </div>
 
+          <div className="flex gap-3 mt-6 justify-end border-t border-gray-100 pt-4">
+            <ModalButtons 
+              text="Cancelar" 
+              onClick={() => setIsFunOpen(false)} 
+              variant="secondary"
+            />
+            <ModalButtons 
+              text="Cadastrar Funcionário" 
+              onClick={criarFuncionario} 
+              variant="primary"
+            />
+          </div>
+        </div>
+      </Modal1>
+
+      {/* Modal de Criar Perfil */}
+      <Modal1 isOpen={isPerfilOpen} onClose={() => setIsPerfilOpen(false)}>
+        <ModalIcon image={perfilIcon}/>
+        <div className="flex flex-col gap-4">
+          <div className="text-center mb-4">
+            <p className="text-gray-600">Crie um novo perfil com as permissões específicas</p>
+          </div>
+
+          <div className="grid grid-cols-1 gap-4">
+            <ModalInput2 
+              label="Nome do Perfil*" 
+              placeholder="Nome do perfil"
+              name="nome"
+              value={perfilData.nome}
+              onChange={handlePerfilChange}
+            />
+          </div>
+
           <div className="mt-6">
-            <h3 className="text-lg font-semibold text-gray-800 mb-3 pb-2 border-b border-gray-200">Permissões de Acesso</h3>
+            <h3 className="text-lg font-semibold text-gray-800 mb-3 pb-2 border-b border-gray-200">Permissões do Perfil</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-64 overflow-y-auto p-2">
               {permissoes.map((modulo, index) => (
                 <div key={index} className="bg-white p-4 rounded-lg shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
@@ -342,12 +511,12 @@ export const PainelAdm = () => {
           <div className="flex gap-3 mt-6 justify-end border-t border-gray-100 pt-4">
             <ModalButtons 
               text="Cancelar" 
-              onClick={() => setIsFunOpen(false)} 
+              onClick={() => setIsPerfilOpen(false)} 
               variant="secondary"
             />
             <ModalButtons 
-              text="Cadastrar Funcionário" 
-              onClick={criarFuncionario} 
+              text="Criar Perfil" 
+              onClick={criarPerfil} 
               variant="primary"
             />
           </div>
@@ -365,6 +534,7 @@ export const PainelAdm = () => {
           paginationPageSize={10}
           rowSelection="multiple"
           editType="fullRow"
+          onGridReady={() => gridRef.current.api.sizeColumnsToFit()}
         />
       </div>
     </div>
