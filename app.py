@@ -652,7 +652,6 @@ def gerar_relatorio_pdf(tabela):
         return jsonify({"erro": str(e)}), 500
 
 #Perfil    
-@app.route('/perfis', methods=['POST'])
 def criar_perfil():
     perfil_admin = request.headers.get('perfil')
 
@@ -660,46 +659,21 @@ def criar_perfil():
         return jsonify({"erro": "Sem permissão para criar perfil"}), 403
 
     data = request.json
-    nome_perfil = data.get("nome")
+    nome = data.get("nome")
     permissoes = data.get("permissoes", [])
 
-    if not nome_perfil:
+    if not nome:
         return jsonify({"erro": "Nome do perfil é obrigatório"}), 400
 
-    conn = conectar()
-    cursor = conn.cursor()
-
     try:
-        cursor.execute("SELECT Id FROM Perfis WHERE Nome = ?", (nome_perfil,))
-        if cursor.fetchone():
-            return jsonify({"erro": "Perfil já existente"}), 400
-
-        cursor.execute("INSERT INTO Perfis (Nome) VALUES (?)", (nome_perfil,))
-        perfil_id = cursor.lastrowid
-
-        for p in permissoes:
-            modulo = p.get("modulo")
-            if not modulo:
-                continue  
-
-            p_create = int(p.get("create", 0))
-            p_read   = int(p.get("read", 0))
-            p_update = int(p.get("update", 0))
-            p_delete = int(p.get("delete", 0))
-
-            cursor.execute("""
-                INSERT INTO Permissoes (Id_Perfil, Modulo, P_Create, P_Read, P_Update, P_Delete)
-                VALUES (?, ?, ?, ?, ?, ?)
-            """, (perfil_id, modulo, p_create, p_read, p_update, p_delete))
-
-        conn.commit()
-        return jsonify({"mensagem": "Perfil criado com sucesso."}), 201
-
+        def criar_perfil_db(nome, permissoes):
+            return perfil_model.criar_perfil(nome, permissoes)
+        resultado = criar_perfil_db(nome, permissoes)
+        status = 201 if "mensagem" in resultado else 400
+        return jsonify(resultado), status
     except Exception as e:
-        conn.rollback()
+        traceback.print_exc()
         return jsonify({"erro": f"Erro ao criar perfil: {str(e)}"}), 500
-    finally:
-        conn.close()
 
 @app.route('/perfis', methods=['GET'])
 def listar_perfis():
